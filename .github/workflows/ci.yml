@@ -81,3 +81,44 @@ jobs:
         run: |
           pip install pytest
           pytest tests/unit/test_policy_guard.py
+
+  # Real Postgres: migrations, RLS policies and the ledger append-only trigger.
+  # SQLite-backed pytest cannot exercise any of these.
+  api-postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: callshield
+          POSTGRES_PASSWORD: callshield_ci
+          POSTGRES_DB: callshield
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U callshield -d callshield"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      CALLSHIELD_DB_URL: postgresql+psycopg://callshield:callshield_ci@localhost:5432/callshield
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: apps/api/pyproject.toml
+      - name: Install
+        working-directory: apps/api
+        run: pip install -e ".[dev,postgres]"
+      - name: Alembic upgrade head
+        working-directory: apps/api
+        run: alembic upgrade head
+      - name: Verify RLS and ledger immutability
+        run: python scripts/verify_postgres_rls.py
+      - name: Alembic downgrade and re-upgrade (round trip)
+        working-directory: apps/api
+        run: |
+          alembic downgrade base
+          alembic upgrade head

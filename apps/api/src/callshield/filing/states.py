@@ -30,8 +30,9 @@ SUBMITTED_EXTERNALLY = "SUBMITTED_EXTERNALLY"
 SUBMISSION_TRANSITIONS: dict[str, frozenset[str]] = {
     S.PENDING.value: frozenset({S.IN_PROGRESS.value, S.FAILED.value}),
     S.IN_PROGRESS.value: frozenset({S.SUBMITTED.value, S.FAILED.value, S.UNKNOWN.value}),
-    # UNKNOWN can only be resolved by a status lookup that shows a real acknowledgment.
-    S.UNKNOWN.value: frozenset({S.SUBMITTED.value}),
+    # UNKNOWN is resolved by a status lookup that shows a real acknowledgment, or by the user
+    # recording what they verified themselves (never automatic, see filing.unknown_resolution).
+    S.UNKNOWN.value: frozenset({S.SUBMITTED.value, S.FAILED.value, SUBMITTED_EXTERNALLY}),
     S.SUBMITTED.value: frozenset({S.AGENCY_ACKNOWLEDGED.value}),
     S.EXTERNAL_SUBMISSION_REQUIRED.value: frozenset({SUBMITTED_EXTERNALLY}),
     S.AGENCY_ACKNOWLEDGED.value: frozenset(),
@@ -69,6 +70,12 @@ def submission_transition_allowed(from_state: str, to_state: str, ctx: Context) 
     """Table + guard check for filing_submissions.state. Fails closed."""
     if to_state not in SUBMISSION_TRANSITIONS.get(from_state, frozenset()):
         return GuardResult(False, f"{from_state} -> {to_state} is not a valid transition")
+    if (
+        from_state == S.UNKNOWN.value
+        and to_state in {S.FAILED.value, SUBMITTED_EXTERNALLY}
+        and not ctx.get("user_resolution")
+    ):
+        return GuardResult(False, "leaving UNKNOWN this way requires the user's own verification")
     if to_state == S.IN_PROGRESS.value and not ctx.get("approval_valid"):
         return GuardResult(False, "a valid exact-digest approval is required before sending")
     if to_state == S.SUBMITTED.value and not (
@@ -86,6 +93,14 @@ def submission_transition_allowed(from_state: str, to_state: str, ctx: Context) 
             False, "external submission must be attested by the user with a receipt row"
         )
     return GuardResult(True)
+
+
+def _ack_or_attested(ctx: Context) -> GuardResult:
+    if ctx.get("transport_ack") and _nonempty(ctx, "transport_ref"):
+        return GuardResult(True)
+    if ctx.get("external_submission_attested") and ctx.get("receipt_id"):
+        return GuardResult(True)
+    return GuardResult(False, "filing guard missing: transport ack or attested receipt")
 
 
 def _all_true(*keys: str) -> Guard:
@@ -106,7 +121,7 @@ _CASE_GUARDS: tuple[tuple[E, E, Guard], ...] = (
         _all_true("approved_payload_digest", "payload_digest_matches", "snapshot_digest_current"),
     ),
     (E.USER_APPROVED, E.SUBMISSION_IN_PROGRESS, _all_true("approval_valid", "submission_enabled")),
-    (E.SUBMISSION_IN_PROGRESS, E.SUBMITTED, _all_true("transport_ack", "transport_ref")),
+    (E.SUBMISSION_IN_PROGRESS, E.SUBMITTED, _ack_or_attested),
     (E.EXTERNAL_SUBMISSION_REQUIRED, E.SUBMITTED, _all_true("receipt_id")),
     (E.SUBMITTED, E.AGENCY_ACKNOWLEDGED, _all_true("agency_confirmation_distinct")),
 )

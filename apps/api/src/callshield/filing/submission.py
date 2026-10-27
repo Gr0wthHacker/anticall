@@ -130,6 +130,8 @@ def move_submission(
             code="INVALID_SUBMISSION_TRANSITION",
         )
     sub.state = to_state
+    if to_state == "UNKNOWN":
+        ext.unknown_since = utcnow()
     if to_state not in ACTIVE_STATES:
         ext.dedupe_key = None  # a failed attempt no longer blocks a fresh approved one
 

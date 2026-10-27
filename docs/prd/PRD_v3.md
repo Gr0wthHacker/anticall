@@ -1,4 +1,7 @@
 # CALLSHIELD NETWORK
+
+> **Superseded in part (2026-10-27):** the outbound opt-out call (R-002 to R-004, `start-contact`, `contact-authorizations`, the "Contact now" action, "verified company contact") is replaced by the callback flow in [CHANGE_callback_flow.md](CHANGE_callback_flow.md) and ADR 0006. Text below is kept as history.
+
 ## Final Development Product Requirements Document — v3.0
 **Date:** October 27, 2026  
 **Status:** Development kickoff approved for local/synthetic prototyping; public telephony and filing require explicit legal and technical gates  

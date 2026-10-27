@@ -133,14 +133,17 @@ def _dispatch(
     return handle_screening_failure(session, settings, line, event, adapter)
 
 
-def process_webhook(
+def authenticate_line_webhook(
     session: Session,
     settings: Settings,
     provider: str,
     line_key: str,
     headers: Mapping[str, str],
     body: bytes,
-) -> IngestOutcome:
+) -> tuple[ProtectedLine, LineEndpoint, ProviderAdapter]:
+    """Resolve the line from (provider, line_key), verify the signature with THAT line's
+    secret, and burn the nonce. The tenant is whatever owns the verified line; nothing in the
+    payload can change it. Every provider-authenticated route must start here."""
     adapter = get_adapter(provider)
     if adapter is None:
         raise ApiError("unknown provider", code="UNKNOWN_PROVIDER", status_code=404)
@@ -157,6 +160,20 @@ def process_webhook(
         logger.warning("webhook rejected line=%s reason=%s", line.id, exc.code)
         raise _rejected() from exc
     _record_nonce(session, line, nonce)
+    return line, endpoint, adapter
+
+
+def process_webhook(
+    session: Session,
+    settings: Settings,
+    provider: str,
+    line_key: str,
+    headers: Mapping[str, str],
+    body: bytes,
+) -> IngestOutcome:
+    line, endpoint, adapter = authenticate_line_webhook(
+        session, settings, provider, line_key, headers, body
+    )
     try:
         event = adapter.parse_event(body)
     except MalformedEventError as exc:

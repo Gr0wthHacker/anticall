@@ -11,7 +11,7 @@ Spec: `docs/prd/PRD_v3.md`. Backend: `apps/api` (Python 3.11+, FastAPI, SQLAlche
 - No LLM may be given dial capability or the ability to decide on calls/filings (PRD 9, 19.12). Deterministic policy gates decide; models only classify/summarize, and their output is labeled `MODEL_INFERRED`.
 - All risky features default OFF (`outbound_enabled`, `live_stt_enabled`, `ai_outbound_enabled`, `community_enabled`, `filing_submission_enabled`). Gate code on `Settings`; raise `PolicyBlockedError` when off. Never flip defaults.
 - Never output `VIOLATION_PROVEN`; never equate ACKNOWLEDGED with suppression; never invent a receipt/confirmation number.
-- Caller-ID-only destinations can never be dialed automatically. `start-contact` needs a verified destination + explicit `ContactAuthorization` (PRD 8.1).
+- Caller-ID-only destinations can never be dialed automatically. `start-contact` is removed (returns 410); callbacks go through the gated callback flow, see docs/prd/CHANGE_callback_flow.md. (Superseded text: `start-contact` needed a verified destination + explicit `ContactAuthorization`, PRD 8.1.)
 - Corrections are appended (new rows/events/versions), never in-place edits of evidence.
 
 ## Layout (`apps/api/src/callshield/`)

@@ -48,22 +48,25 @@ flowchart LR
   E --> UI[Dashboard]
 ```
 
-## Outbound resolution flow (PRD 7.2)
+## Outbound callback flow (CHANGE_callback_flow; replaces PRD 7.2 outbound resolution)
+
+> Supersedes the PRD 7.2 outbound opt-out call, which was removed (ADR 0006). The callback is off by default (`CALLSHIELD_CALLBACK_CALLBACK_ENABLED=false`) and counsel-gated (G1-G5).
 
 ```mermaid
 flowchart LR
-  S[User starts authorized case] --> V[Verify destination + provenance]
-  V -->|caller-ID-only| X[Blocked: manual options]
-  V --> J[Jurisdiction + consent policy]
-  J -->|not authorized| X
-  J --> C[Call via SIP<br/>bounded session]
-  C --> I[IVR / AI / human]
-  I --> O[Outcome]
-  O --> L[Evidence ledger]
-  L --> R[Case review]
+  I[Logged inbound call] --> G[Gates 1-7, server-side<br/>record, attestation A, window,<br/>authorization, blocklist, caps, hours]
+  G -->|any fail| X[Blocked: reason shown, complaint flow]
+  G --> U[Single-use user authorization<br/>expires in 30 min]
+  U --> R[Re-check gates, then dial<br/>user's verified number only]
+  R --> W[Listen window<br/>RAM only, no persistence]
+  W --> D[Fixed disclosure<br/>automated assistant]
+  D --> Q[Up to 4 identifying questions]
+  Q -->|wrong party / stop| H[Hang up + instance blocklist]
+  Q --> F[Hang up; claimed fields]
+  F --> L[Ledger + case evidence]
 ```
 
-Further outbound calls require fresh user action; no loop exists.
+The AI has no dial tool (ADR 0003). Caps are enforced in the dialer service. The old `start-contact` and `contact-authorizations` endpoints return `410 OUTBOUND_OPT_OUT_REMOVED`.
 
 ## Automatic case-building worker (PRD 19.12)
 
@@ -85,7 +88,7 @@ Jobs are idempotent; original provider webhook references are retained; derived 
 
 ## State machines
 
-- Resolve (5.2.1): `CREATED -> DESTINATION_REVIEW -> VERIFIED_DESTINATION -> USER_APPROVED_CONTACT -> IN_PROGRESS -> REQUEST_DELIVERED -> {ACKNOWLEDGED, UNCONFIRMED, REFUSED, INTERRUPTED} -> {MONITORING, NEXT_STEP_REVIEW, CLOSED}`. `ACKNOWLEDGED` never equals suppression.
+- Resolve (5.2.1; the automated contact states are superseded by the callback flow, manual attempts still use them): `CREATED -> DESTINATION_REVIEW -> VERIFIED_DESTINATION -> USER_APPROVED_CONTACT -> IN_PROGRESS -> REQUEST_DELIVERED -> {ACKNOWLEDGED, UNCONFIRMED, REFUSED, INTERRUPTED} -> {MONITORING, NEXT_STEP_REVIEW, CLOSED}`. `ACKNOWLEDGED` never equals suppression.
 - Case (19.3): `OPENED -> INTAKE -> EVIDENCE_COLLECTING -> REVIEW_REQUIRED -> ELIGIBLE_TO_DRAFT -> DRAFT_READY -> USER_APPROVED -> SUBMISSION_IN_PROGRESS -> SUBMITTED / SUBMISSION_FAILED -> AGENCY_ACKNOWLEDGED -> MONITORING -> SUPPLEMENT_PENDING -> CLOSED`, with guards per 19.3.
 
 ## Failure modes (PRD 7.3)
@@ -96,5 +99,5 @@ SIP registration failure -> notify, safe fallback. AI latency -> transfer/neutra
 
 - Every telephony/legal/financial command carries `actor_id`, `scope`, `authorization_basis`, `idempotency_key`.
 - All network functions default disabled.
-- Tenant isolation on every relation (RLS planned on Postgres).
+- Tenant isolation on every relation (Postgres RLS via `app.tenant_id`; checked by the `api-postgres` CI job, not yet run).
 - Prompt policies and rulesets are separately versioned.

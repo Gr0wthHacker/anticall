@@ -6,6 +6,7 @@ import uuid
 from collections.abc import Awaitable, Callable
 
 from fastapi import FastAPI, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import Engine
 
 from callshield import __version__
@@ -28,6 +29,20 @@ async def request_id_middleware(
     return response
 
 
+def install_cors(app: FastAPI, settings: Settings) -> None:
+    """CORS only for explicitly configured origins. Auth is a bearer header, so no cookies."""
+    if not settings.cors_allow_origins:
+        return
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_allow_origins,
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+        allow_headers=["Authorization", "Content-Type", "Idempotency-Key", REQUEST_ID_HEADER],
+        expose_headers=[REQUEST_ID_HEADER],
+    )
+
+
 def create_app(settings: Settings | None = None, engine: Engine | None = None) -> FastAPI:
     settings = settings or get_settings()
     app = FastAPI(
@@ -42,5 +57,6 @@ def create_app(settings: Settings | None = None, engine: Engine | None = None) -
     app.state.session_factory = make_session_factory(engine)
     app.middleware("http")(request_id_middleware)
     install_error_handlers(app)
+    install_cors(app, settings)  # added last so it is outermost and answers preflights
     app.state.mounted_routers = include_discovered_routers(app)
     return app

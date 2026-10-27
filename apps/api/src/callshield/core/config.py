@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 
-from pydantic import SecretStr
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -35,6 +35,15 @@ class Settings(BaseSettings):
     # --- provider webhooks ---
     webhook_secret: SecretStr = SecretStr("")
     webhook_replay_window_seconds: int = 300
+    webhook_receipt_retention_days: int = Field(
+        default=30, ge=1
+    )  # webhook.purge_receipts deletes older nonces
+
+    # --- CORS: empty list = no CORS headers at all. Set as a JSON list in the environment. ---
+    cors_allow_origins: list[str] = []
+
+    # --- filing: an UNKNOWN submission older than this asks the user to verify it ---
+    filing_unknown_verify_after_hours: int = Field(default=24, ge=1)
 
     # --- outbound safety limits (conservative) ---
     max_call_seconds: int = 600
@@ -47,6 +56,14 @@ class Settings(BaseSettings):
     retention_recording_days: int = 30
     retention_transcript_days: int = 30
     retention_case_days: int = 365
+
+    @field_validator("cors_allow_origins")
+    @classmethod
+    def _explicit_origins_only(cls, origins: list[str]) -> list[str]:
+        cleaned = [o.strip().rstrip("/") for o in origins if o.strip()]
+        if "*" in cleaned:
+            raise ValueError("cors_allow_origins must list explicit origins, never '*'")
+        return cleaned
 
     def enabled_capabilities(self) -> dict[str, bool]:
         return {

@@ -34,6 +34,23 @@ Gated features, all default `false`: `OUTBOUND_ENABLED`, `LIVE_STT_ENABLED`, `AI
 Set `JWT_SECRET` for anything beyond local dev. Safety limits: `MAX_CALL_SECONDS`,
 `OUTBOUND_COOLDOWN_SECONDS` (900), `MAX_ATTEMPTS_PER_CASE_PER_DAY` (3).
 
+Other settings:
+
+- `CORS_ALLOW_ORIGINS` (JSON list, default `[]` = no CORS headers), e.g.
+  `CALLSHIELD_CORS_ALLOW_ORIGINS='["https://app.example.com"]'`. Explicit origins only; `"*"` is
+  rejected at startup. Credentials are never allowed (auth is a bearer header).
+- `WEBHOOK_RECEIPT_RETENTION_DAYS` (30): the `webhook.purge_receipts` job deletes replay nonces
+  older than this for the job's tenant. Enqueue it per tenant on a schedule.
+- `FILING_UNKNOWN_VERIFY_AFTER_HOURS` (24): `GET /v1/filings/{id}` reports
+  `needs_user_verification` once a submission has been UNKNOWN this long. The user exits UNKNOWN
+  with `POST /v1/filings/{id}/resolve-unknown` (`verified_submitted` | `verified_not_submitted` |
+  `abandon`); the server never resends or invents a receipt.
+
+Provider feeds: `POST /v1/webhooks/{provider}/{line_key}/outbound-attestation` (same HMAC signing
+as the call webhook) records the provider-reported outbound attestation level; only `A` unblocks
+callbacks. Acknowledgment: `GET /v1/acknowledgments/current`, `POST /v1/acknowledgments`,
+`GET /v1/acknowledgments/me`.
+
 ## PostgreSQL notes
 
 The initial migration enables row-level security (`app.tenant_id`) on every tenant table and a

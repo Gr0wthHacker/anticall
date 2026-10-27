@@ -13,14 +13,18 @@ npm run lint && npm run typecheck && npm test && npm run build
 
 ## API base URL and CORS
 
-`NEXT_PUBLIC_API_BASE_URL` (build time, default `http://127.0.0.1:8000`). The API has no CORS middleware, so a browser on another origin cannot call it directly. Use the built-in proxy instead:
+`NEXT_PUBLIC_API_BASE_URL` is read at build time (default `http://127.0.0.1:8000`). Two ways to reach the API:
+
+**1. Proxy (same origin, no CORS needed).** Set the base URL to `/api-proxy`; Next rewrites `/api-proxy/*` to `API_PROXY_TARGET`:
 
 ```bash
 # Git Bash on Windows: prefix with MSYS_NO_PATHCONV=1 or "/api-proxy" is rewritten to a Windows path
 NEXT_PUBLIC_API_BASE_URL=/api-proxy API_PROXY_TARGET=http://127.0.0.1:8000 npm run dev
 ```
 
-`/api-proxy/*` is rewritten to `API_PROXY_TARGET` (read at build time; rewrites are baked into the standalone build).
+`API_PROXY_TARGET` is read at build time; rewrites are baked into the standalone build.
+
+**2. Direct (cross-origin).** Set `NEXT_PUBLIC_API_BASE_URL` to the API origin (for example `https://api.example.com`) and configure the API with `CALLSHIELD_CORS_ALLOW_ORIGINS='["<dashboard origin>"]'` (JSON list, never `*`). Without that variable the API sends no CORS headers and the browser blocks the calls. See `docs/deployment/self-hosting.md`.
 
 ## Docker
 

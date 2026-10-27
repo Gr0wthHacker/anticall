@@ -10,10 +10,29 @@ Self-hostable, open-source tooling for defending against persistent unwanted tel
 | Pillar | Purpose |
 |---|---|
 | **Defend** | Screen inbound calls on lines you control. Deterministic rules decide first; an LLM never decides routing alone. Trusted callers get through, unknown callers are screened, failures fall back to ordinary routing. |
-| **Resolve** | Case management for opt-out requests. You start a bounded, purpose-specific contact to a *verified* business endpoint. Acknowledgment is tracked separately from actual suppression. |
+| **Resolve** | Case management for opt-out requests: manual attempt logging, timeline and next steps. Acknowledgment is tracked separately from actual suppression. The automated outbound opt-out call was removed; see the callback flow below. |
 | **Enforce** | Append-only, provenance-labeled evidence timeline, versioned exports with hashes, and user-reviewed complaint drafts. Official manual handoff when no documented submission channel exists. |
 
-A fourth module, Community (privacy-preserving campaign signals), is post-MVP and off by default.
+A fourth module, Community (privacy-preserving campaign signals), is post-MVP and not started (database tables only).
+
+## Status
+
+| Area | State |
+|---|---|
+| Backend (`apps/api`) | FastAPI modular monolith: auth/tenancy, Defend (lines, routing, screening), Resolve (cases, manual attempts), Enforce (ledger, evidence, case building, exports, filing drafts with manual handoff), callback flow. Unit and integration tests run on SQLite. |
+| Dashboard (`apps/dashboard`) | Next.js app over the API: cases, evidence timeline, callback panel, filing. |
+| Traceability | [`docs/developer/traceability.md`](docs/developer/traceability.md) has per-requirement status with module and test paths. |
+
+### Callback flow (off by default)
+
+The outbound opt-out call from PRD v3 is **removed**. In its place, the user can authorize a single automated callback to a number that recently called them, to identify who is behind the call for a complaint. It is disabled unless `CALLSHIELD_CALLBACK_CALLBACK_ENABLED=true` and runs only behind seven server-side gates (inbound record, STIR/SHAKEN attestation A, time window, single-use user authorization, blocklist, caps, calling hours), checked at queue time and again before dialing. Counsel release gates G1-G5 must clear before real numbers are called. Spec: [`docs/prd/CHANGE_callback_flow.md`](docs/prd/CHANGE_callback_flow.md). Decision: [ADR 0006](docs/developer/adr/0006-callback-flow-replaces-outbound-opt-out.md).
+
+### Honest limits
+
+- Telephony is mock only. No real SIP trunk, provider adapter dialing, or live call has been exercised.
+- Postgres row-level security and the ledger append-only trigger are verified only by the `api-postgres` CI job (`scripts/verify_postgres_rls.py`). That job is new and has not yet run; the local test suite uses SQLite.
+- Docker Compose files and the Asterisk harness have not been independently verified.
+- No agency submission beyond manual handoff. Legal text is draft and not reviewed by counsel.
 
 ## What it will never do (non-goals)
 
@@ -24,6 +43,7 @@ A fourth module, Community (privacy-preserving campaign signals), is post-MVP an
 - No bulk or automatic complaint submission.
 - No unconsented recording or live interception.
 - No claim that a company is responsible for calls based only on displayed caller ID.
+- No voice biometrics, and no callback to numbers without an A-attested inbound record.
 
 The "11 calls to get removed" story that motivated the project is user friction evidence, not a dialing quota. See [PRD section 1](docs/prd/PRD_v3.md).
 
@@ -61,13 +81,13 @@ More: [`docs/developer/architecture.md`](docs/developer/architecture.md).
 
 ```
 apps/api/            FastAPI backend (Python 3.12)
-apps/dashboard/      Next.js dashboard (planned)
+apps/dashboard/      Next.js dashboard
 apps/worker/         background worker (planned)
 packages/            domain packages (planned; see PRD section 13)
 integrations/        asterisk R0 harness, voice-provider and local-AI adapter notes
 infra/docker/        Dockerfiles and Compose
 infra/monitoring/    Prometheus config and alert rules
-scripts/             policy_guard.py and repo tooling
+scripts/             policy_guard.py, verify_postgres_rls.py
 tests/               unit, integration, telephony, legal-policy, red-team
 docs/                prd, legal drafts, developer, deployment, privacy
 ```

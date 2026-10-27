@@ -1,6 +1,82 @@
 {
   "components": {
     "schemas": {
+      "AcknowledgmentIn": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "title": "Items",
+            "type": "object"
+          },
+          "text_sha256": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Text Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text_sha256",
+          "items"
+        ],
+        "title": "AcknowledgmentIn",
+        "type": "object"
+      },
+      "AcknowledgmentOut": {
+        "properties": {
+          "accepted_at": {
+            "format": "date-time",
+            "title": "Accepted At",
+            "type": "string"
+          },
+          "acknowledgment_id": {
+            "title": "Acknowledgment Id",
+            "type": "string"
+          },
+          "acknowledgment_version": {
+            "title": "Acknowledgment Version",
+            "type": "string"
+          },
+          "created": {
+            "default": true,
+            "title": "Created",
+            "type": "boolean"
+          },
+          "item_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Item Ids",
+            "type": "array"
+          },
+          "operator_id": {
+            "title": "Operator Id",
+            "type": "string"
+          },
+          "text_sha256": {
+            "title": "Text Sha256",
+            "type": "string"
+          },
+          "user_id": {
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "acknowledgment_id",
+          "user_id",
+          "acknowledgment_version",
+          "text_sha256",
+          "operator_id",
+          "item_ids",
+          "accepted_at"
+        ],
+        "title": "AcknowledgmentOut",
+        "type": "object"
+      },
       "AiCommentaryOut": {
         "properties": {
           "label": {
@@ -1867,6 +1943,11 @@
             "title": "Kind",
             "type": "string"
           },
+          "needs_user_verification": {
+            "default": false,
+            "title": "Needs User Verification",
+            "type": "boolean"
+          },
           "next_step": {
             "title": "Next Step",
             "type": "string"
@@ -1925,6 +2006,29 @@
               }
             ],
             "title": "Transport Response Ref"
+          },
+          "unknown_since": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unknown Since"
+          },
+          "user_resolution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Resolution"
           }
         },
         "required": [
@@ -2566,6 +2670,37 @@
         "title": "MeResponse",
         "type": "object"
       },
+      "MyAcknowledgmentOut": {
+        "properties": {
+          "acknowledged": {
+            "title": "Acknowledged",
+            "type": "boolean"
+          },
+          "current_text_sha256": {
+            "title": "Current Text Sha256",
+            "type": "string"
+          },
+          "current_version": {
+            "title": "Current Version",
+            "type": "string"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/AcknowledgmentOut"
+            },
+            "title": "History",
+            "type": "array"
+          }
+        },
+        "required": [
+          "acknowledged",
+          "current_version",
+          "current_text_sha256",
+          "history"
+        ],
+        "title": "MyAcknowledgmentOut",
+        "type": "object"
+      },
       "NextStepOut": {
         "properties": {
           "id": {
@@ -2852,6 +2987,43 @@
         ],
         "title": "ResolutionState",
         "type": "string"
+      },
+      "ResolveUnknownInput": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmation_number": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmation Number"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "resolution": {
+            "$ref": "#/components/schemas/UnknownResolution"
+          }
+        },
+        "required": [
+          "resolution"
+        ],
+        "title": "ResolveUnknownInput",
+        "type": "object"
       },
       "ReviewIn": {
         "properties": {
@@ -3284,6 +3456,15 @@
           "OVERRIDE"
         ],
         "title": "TrustedContactKind",
+        "type": "string"
+      },
+      "UnknownResolution": {
+        "enum": [
+          "verified_submitted",
+          "verified_not_submitted",
+          "abandon"
+        ],
+        "title": "UnknownResolution",
         "type": "string"
       },
       "UnlinkRequest": {
@@ -4136,6 +4317,107 @@
         "summary": "Readyz",
         "tags": [
           "health"
+        ]
+      }
+    },
+    "/v1/acknowledgments": {
+      "post": {
+        "operationId": "accept_acknowledgment_v1_acknowledgments_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcknowledgmentIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcknowledgmentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Accept Acknowledgment",
+        "tags": [
+          "acknowledgments"
+        ]
+      }
+    },
+    "/v1/acknowledgments/current": {
+      "get": {
+        "description": "The exact versioned text to display. Items are unchecked by default.",
+        "operationId": "current_acknowledgment_v1_acknowledgments_current_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Current Acknowledgment V1 Acknowledgments Current Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Current Acknowledgment",
+        "tags": [
+          "acknowledgments"
+        ]
+      }
+    },
+    "/v1/acknowledgments/me": {
+      "get": {
+        "operationId": "my_acknowledgments_v1_acknowledgments_me_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyAcknowledgmentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "My Acknowledgments",
+        "tags": [
+          "acknowledgments"
         ]
       }
     },
@@ -7155,6 +7437,65 @@
         ]
       }
     },
+    "/v1/filings/{filing_id}/resolve-unknown": {
+      "post": {
+        "description": "User records what they verified about an UNKNOWN filing. Never resends or invents.",
+        "operationId": "resolve_unknown_filing_v1_filings__filing_id__resolve_unknown_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "filing_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Filing Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveUnknownInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilingOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Resolve Unknown Filing",
+        "tags": [
+          "filings"
+        ]
+      }
+    },
     "/v1/filings/{filing_id}/status-check": {
       "post": {
         "description": "Ask the agency's status interface. Never re-sends the filing.",
@@ -9518,6 +9859,59 @@
           }
         },
         "summary": "Provider Webhook",
+        "tags": [
+          "webhooks"
+        ]
+      }
+    },
+    "/v1/webhooks/{provider}/{line_key}/outbound-attestation": {
+      "post": {
+        "operationId": "outbound_attestation_webhook_v1_webhooks__provider___line_key__outbound_attestation_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider",
+            "required": true,
+            "schema": {
+              "title": "Provider",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "line_key",
+            "required": true,
+            "schema": {
+              "title": "Line Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Outbound Attestation Webhook V1 Webhooks  Provider   Line Key  Outbound Attestation Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Outbound Attestation Webhook",
         "tags": [
           "webhooks"
         ]

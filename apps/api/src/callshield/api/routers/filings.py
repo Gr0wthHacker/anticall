@@ -39,6 +39,7 @@ from callshield.filing.schemas import (
     filing_out,
 )
 from callshield.filing.submit import SubmitResult, refresh_status, submit_draft
+from callshield.filing.unknown_resolution import ResolveUnknownInput, resolve_unknown
 
 router = APIRouter(tags=["filings"])
 
@@ -75,10 +76,16 @@ def _draft_response(
     return draft_out(draft, meta, created, _prepared(ctx, draft, meta))
 
 
-def _filing_response(ctx: TenantContext, result: SubmitResult) -> FilingOut:
+def _filing_response(ctx: TenantContext, result: SubmitResult, settings: Settings) -> FilingOut:
     receipts = list(queries.receipts_for(ctx.session, ctx.tenant_id, result.submission.id))
-    case_id = result.ext.case_id
-    return filing_out(result.submission, result.ext, case_id, receipts, result.created)
+    return filing_out(
+        result.submission,
+        result.ext,
+        result.ext.case_id,
+        receipts,
+        result.created,
+        settings.filing_unknown_verify_after_hours,
+    )
 
 
 @router.get("/v1/filing-destinations", response_model=list[DestinationOut])
@@ -130,18 +137,18 @@ def submit_filing_draft(
     result = submit_draft(
         ctx.session, settings, _actor(ctx), case, draft, meta, body.idempotency_key
     )
-    return _filing_response(ctx, result)
+    return _filing_response(ctx, result, settings)
 
 
 @router.post("/v1/filing-drafts/{draft_id}/external-receipt", response_model=FilingOut)
 def record_external_receipt(
-    draft_id: uuid.UUID, body: ExternalReceiptInput, ctx: Writer
+    draft_id: uuid.UUID, body: ExternalReceiptInput, ctx: Writer, settings: AppSettings
 ) -> FilingOut:
     """Record that YOU filed on the official site (USER_ATTESTED, not agency proof)."""
     draft, meta = queries.get_draft_with_meta(ctx.session, ctx.tenant_id, draft_id)
     case = scoped_get_or_404(ctx.session, Case, draft.case_id, ctx.tenant_id)
     result = record_external_filing(ctx.session, _actor(ctx), case, draft, meta, body)
-    return _filing_response(ctx, result)
+    return _filing_response(ctx, result, settings)
 
 
 def _load_filing(
@@ -151,20 +158,32 @@ def _load_filing(
 
 
 @router.get("/v1/filings/{filing_id}", response_model=FilingOut)
-def get_filing(filing_id: uuid.UUID, ctx: Reader) -> FilingOut:
+def get_filing(filing_id: uuid.UUID, ctx: Reader, settings: AppSettings) -> FilingOut:
     """State and recorded receipts only. A receipt is never inferred or invented."""
     sub, ext = _load_filing(ctx, filing_id)
-    return _filing_response(ctx, SubmitResult(sub, ext, False))
+    return _filing_response(ctx, SubmitResult(sub, ext, False), settings)
 
 
 @router.post("/v1/filings/{filing_id}/status-check", response_model=FilingOut)
-def check_filing_status(filing_id: uuid.UUID, ctx: Writer) -> FilingOut:
+def check_filing_status(filing_id: uuid.UUID, ctx: Writer, settings: AppSettings) -> FilingOut:
     """Ask the agency's status interface. Never re-sends the filing."""
     sub, ext = _load_filing(ctx, filing_id)
     _draft, meta = queries.get_draft_with_meta(ctx.session, ctx.tenant_id, sub.draft_id)
     case = scoped_get_or_404(ctx.session, Case, ext.case_id, ctx.tenant_id)
     refresh_status(ctx.session, _actor(ctx), case, sub, ext, meta)
-    return _filing_response(ctx, SubmitResult(sub, ext, False))
+    return _filing_response(ctx, SubmitResult(sub, ext, False), settings)
+
+
+@router.post("/v1/filings/{filing_id}/resolve-unknown", response_model=FilingOut)
+def resolve_unknown_filing(
+    filing_id: uuid.UUID, body: ResolveUnknownInput, ctx: Writer, settings: AppSettings
+) -> FilingOut:
+    """User records what they verified about an UNKNOWN filing. Never resends or invents."""
+    sub, ext = _load_filing(ctx, filing_id)
+    _draft, meta = queries.get_draft_with_meta(ctx.session, ctx.tenant_id, sub.draft_id)
+    case = scoped_get_or_404(ctx.session, Case, ext.case_id, ctx.tenant_id)
+    created = resolve_unknown(ctx.session, _actor(ctx), case, sub, ext, meta, body)
+    return _filing_response(ctx, SubmitResult(sub, ext, created), settings)
 
 
 @router.post("/v1/filings/{filing_id}/supplements", response_model=DraftOut, status_code=201)

@@ -5,6 +5,7 @@ from callshield.db.models import (  # noqa: F401  (register extension tables)
     defend_ext,
     enforce_ext,
     filing_ext,
+    platform_ext,
     resolve_ext,
 )
 from callshield.db.models.community import CampaignLink, CandidateCampaign

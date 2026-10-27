@@ -14,6 +14,7 @@ from fastapi import APIRouter, Depends, Header, Request
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
 
+from callshield.acknowledgment.service import has_acknowledged
 from callshield.audit import actor_for_user, record_audit
 from callshield.auth.deps import TenantContext, tenant_context
 from callshield.auth.scoping import scoped_select
@@ -146,6 +147,7 @@ def callback_capabilities(ctx: Ctx) -> dict[str, Any]:
             "min_minutes_between_attempts": MIN_MINUTES_BETWEEN_ATTEMPTS,
         },
         "remote_ai_processing": False,
+        "acknowledged": has_acknowledged(ctx.session, ctx.tenant_id, ctx.principal.user_id),
     }
 
 

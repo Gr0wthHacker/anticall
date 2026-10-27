@@ -138,6 +138,11 @@ class FilingSubmissionExt(TenantOwned, Base):
     authorization_basis: Mapped[str] = mapped_column(String(200), default="")
     client_idempotency_key: Mapped[str | None] = mapped_column(String(255))
     status_checks: Mapped[int] = mapped_column(Integer, default=0)
+    # Set when the submission becomes UNKNOWN; drives the needs-user-verification flag.
+    unknown_since: Mapped[datetime | None] = mapped_column(UTCDateTime())
+    # What the USER recorded after verifying an UNKNOWN outcome (user-driven exit).
+    user_resolution: Mapped[str | None] = mapped_column(String(32))
+    user_resolved_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
     created_at: Mapped[datetime] = created_column()
 
 

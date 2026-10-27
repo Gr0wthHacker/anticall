@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from callshield.core.clock import utcnow
 from callshield.db.models.enforce import FilingDraft, FilingSubmission, SubmissionApproval
 from callshield.db.models.filing_ext import (
     FilingApprovalDetail,
@@ -108,6 +109,9 @@ class FilingOut(BaseModel):
     receipts: list[ReceiptOut]
     receipt_disclaimer: str = RECEIPT_DISCLAIMER
     next_step: str
+    unknown_since: datetime | None = None
+    needs_user_verification: bool = False
+    user_resolution: str | None = None
     created: bool = True
 
 
@@ -237,11 +241,22 @@ _NEXT_STEPS = {
     "SUBMITTED_EXTERNALLY": "You attested to filing externally; no agency receipt recorded.",
     "PENDING": "Prepared; not sent yet.",
     "IN_PROGRESS": "Sending. Do not file again.",
-    "UNKNOWN": "The outcome is unknown. Check the status; do not re-submit.",
+    "UNKNOWN": "The outcome is unknown. Check the status; do not re-submit. "
+    "If you verified the outcome yourself, record it.",
     "SUBMITTED": "Transport acknowledged. The receiving body has not confirmed.",
     "AGENCY_ACKNOWLEDGED": "The receiving body confirmed receipt. That is not a finding.",
     "FAILED": "Not accepted. You must review and approve again to retry.",
 }
+
+
+def needs_user_verification(
+    sub: FilingSubmission, ext: FilingSubmissionExt, after_hours: int | None
+) -> bool:
+    """True once a submission has been UNKNOWN for `after_hours` (the user must check)."""
+    if after_hours is None or sub.state != "UNKNOWN":
+        return False
+    since = ext.unknown_since or sub.sent_at or sub.created_at
+    return utcnow() - since >= timedelta(hours=after_hours)
 
 
 def filing_out(
@@ -250,6 +265,7 @@ def filing_out(
     case_id: uuid.UUID,
     receipts: list[FilingReceipt],
     created: bool = True,
+    verify_after_hours: int | None = None,
 ) -> FilingOut:
     return FilingOut(
         filing_id=sub.id,
@@ -267,5 +283,8 @@ def filing_out(
         supplements_filing_id=ext.supplements_submission_id,
         receipts=[receipt_out(r) for r in receipts],
         next_step=_NEXT_STEPS.get(sub.state, ""),
+        unknown_since=ext.unknown_since,
+        needs_user_verification=needs_user_verification(sub, ext, verify_after_hours),
+        user_resolution=ext.user_resolution,
         created=created,
     )
