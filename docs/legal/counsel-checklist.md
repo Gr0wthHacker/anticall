@@ -12,6 +12,11 @@
 | f | Hosted provider agreement review (SIP/AI vendors permit automated/AI calls?) | Telephony; outbound | Counsel | NOT STARTED | `provider-compatibility-matrix.md` |
 | g | Insurance review | Public launch (D-008) | Maintainer + counsel | NOT STARTED | |
 | h | Abuse-handling playbook | Public launch | Maintainer + counsel | NOT STARTED | |
+| i | **G1 Consent theory (OPEN - blocking).** Does an inbound call from a number give implied prior express consent under 47 USC 227(b) for one disclosed, automated return call to that number? | All callbacks | Counsel | NOT STARTED | `CHANGE_callback_flow.md`, D-009 |
+| j | **G2 Spoof exposure (OPEN - blocking).** What is our exposure if an A-attested inbound number was nonetheless spoofed, and is the A-attestation gate a sufficient precaution? | All callbacks | Counsel | NOT STARTED | ADR 0006 residual risk |
+| k | **G3 Listen window (OPEN - blocking).** Is live local extraction before disclosure, with no audio or transcript persisted, "recording" under all-party statutes including Cal. Penal Code 632.7? If yes, disclosure must move to the first utterance and extraction start after it. | Listen-window extraction | Counsel | NOT STARTED | Fallback: `listen_window_seconds=0` |
+| l | **G4 State automated-dialer laws (OPEN - blocking).** Do state laws on automated or prerecorded messages (Indiana first) apply to a noncommercial return call, and what do they require? | All callbacks | Counsel | NOT STARTED | |
+| m | **G5 Provider terms (OPEN - blocking).** Do the chosen SIP trunk and any model or voice vendors permit this use? | Provider selection | Counsel | NOT STARTED | `provider-compatibility-matrix.md` |
 
 ## Additional review items (PRD 21.2)
 

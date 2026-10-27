@@ -12,6 +12,7 @@ Source: PRD section 20.4. These must be decided before merge to main for public 
 | D-006 | Initial FTC/FCC forms; any agency-approved submission API | OPEN | Manual handoff only; dry-run draft generation; no remote submission | Destination registry entries with source URL, capability evidence, last-reviewed date; written confirmation before any programmatic adapter |
 | D-007 | Data retention and deletion in operator jurisdictions | OPEN | Design defaults: metadata 90d, recordings 30d, transcripts 30d, cases 1y, logs 14d | Per-jurisdiction retention and deletion rules; legal-hold design; backup erase cycle |
 | D-008 | Legal entity, trademark clearance, insurance | OPEN | None; "CallShield Network" is a working name | Entity formed; name cleared; insurance reviewed; copyright holder in NOTICE |
+| D-009 | Callback consent theory: does an inbound call give implied prior express consent under 47 USC 227(b) for one disclosed, automated return call (gates G1-G5, ADR 0006) | OPEN | Code behind `callback_enabled=false`; no real numbers | Counsel written answers to G1-G5 in `docs/legal/release-gates.md`; spoof-exposure position (G2); listen-window ruling (G3) |
 
 ## Process
 

@@ -27,11 +27,25 @@
 - [ ] 0 automatically inferred legal guilt or asserted damages calculations
 - [ ] No more than 0.5% mislinked incidents in the manually reviewed validation corpus (target; must be measured)
 
+## Callback release gates (CHANGE_callback_flow, ADR 0006, D-009)
+
+> Build is complete behind `callback_enabled=false`. Ship to real numbers only after counsel signs off. If G3 comes back unfavorable, the fallback is already supported: set `listen_window_seconds` to 0 and extraction starts after the disclosure.
+
+| Gate | Blocks | Counsel question | Status |
+|---|---|---|---|
+| G1 Consent theory | All callbacks | Does an inbound call from a number give implied prior express consent under 47 USC 227(b) for one disclosed, automated return call to that number? | **OPEN - blocking** |
+| G2 Spoof exposure | All callbacks | What is our exposure if an A-attested inbound number was nonetheless spoofed, and is the A-attestation gate a sufficient precaution? | **OPEN - blocking** |
+| G3 Listen window | Listen-window extraction | Is live local extraction before disclosure, with no audio or transcript persisted, "recording" under all-party statutes including Cal. Penal Code 632.7? If yes, disclosure must move to the first utterance and extraction start after it. | **OPEN - blocking** |
+| G4 State automated-dialer laws | All callbacks | Do state laws on automated or prerecorded messages (Indiana first) apply to a noncommercial return call, and what do they require? | **OPEN - blocking** |
+| G5 Provider terms | Provider selection | Do the chosen SIP trunk and any model or voice vendors permit this use? | **OPEN - blocking** |
+
+- [ ] G1-G5 closed with linked counsel deliverables (`counsel-checklist.md`, rows i-m)
+
 ## Pre-release housekeeping (21.2, 13)
 
 - [ ] LICENSE unmodified; notices and third-party licenses reviewed; SBOM and license scan published
 - [ ] DISCLAIMER separate from license; no immunity claims
-- [ ] Decisions D-001..D-008 closed (`docs/developer/decision-log.md`)
+- [ ] Decisions D-001..D-009 closed (`docs/developer/decision-log.md`)
 - [ ] Security and privacy review completed externally
 - [ ] Reproducible release process and security advisory channel live
 
@@ -41,6 +55,7 @@
 |---|---|
 | Real telephony events | `CALLSHIELD_TELEPHONY_ENABLED` |
 | Outbound calling | `CALLSHIELD_OUTBOUND_CALLING_ENABLED` |
+| Automated callbacks (blocked by G1-G5) | `CALLSHIELD_CALLBACK_CALLBACK_ENABLED` |
 | AI on calls | `CALLSHIELD_AI_AGENT_ENABLED` |
 | Live STT / recording / persisted transcripts | `CALLSHIELD_LIVE_STT_ENABLED`, `CALLSHIELD_RECORDING_ENABLED`, `CALLSHIELD_TRANSCRIPTION_PERSIST_ENABLED` |
 | Agency submission | `CALLSHIELD_AGENCY_SUBMISSION_ENABLED` |

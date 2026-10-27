@@ -1,5 +1,12 @@
 """Import every model so Base.metadata is complete."""
 
+from callshield.db.models import (  # noqa: F401  (register extension tables)
+    callback_ext,
+    defend_ext,
+    enforce_ext,
+    filing_ext,
+    resolve_ext,
+)
 from callshield.db.models.community import CampaignLink, CandidateCampaign
 from callshield.db.models.defend import (
     CallerObservation,

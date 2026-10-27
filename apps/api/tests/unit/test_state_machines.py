@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 import itertools
+from collections.abc import Iterator
 
+import pytest
+
+from callshield.domain import state_machines as sm
 from callshield.domain.enums import (
     AssessmentStatus,
     EnforceCaseState,
@@ -20,6 +24,17 @@ from callshield.domain.state_machines import (
 
 R = ResolutionState
 E = EnforceCaseState
+
+
+@pytest.fixture(autouse=True)
+def _foundation_guards_only() -> Iterator[None]:
+    """Foundation tests must not see stricter guards other modules register."""
+    saved = {key: list(guards) for key, guards in sm._GUARDS.items()}
+    for key, guards in saved.items():
+        sm._GUARDS[key] = [g for g in guards if g.__module__ == sm.__name__]
+    yield
+    sm._GUARDS.clear()
+    sm._GUARDS.update(saved)
 
 
 def test_tables_cover_every_state() -> None:

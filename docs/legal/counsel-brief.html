@@ -1,0 +1,48 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Counsel Brief</title>
+<style>
+@page{size:Letter;margin:0.6in}
+body{font:10.5pt/1.35 Segoe UI,Arial,sans-serif;color:#111}
+h1{font-size:18pt;margin:0 0 2px}h2{font-size:12pt;margin:14px 0 4px;border-bottom:1px solid #999;padding-bottom:2px}
+.sub{color:#555;margin-bottom:8px}.box{background:#f3f3f3;padding:6px 9px;border-left:4px solid #b00;margin:8px 0}
+ol,ul{margin:3px 0 3px 18px;padding:0}li{margin:2px 0}
+table{border-collapse:collapse;width:100%;margin-top:4px}td,th{border:1px solid #bbb;padding:3px 6px;font-size:9.5pt;text-align:left;vertical-align:top}th{background:#eee}
+</style></head><body>
+<h1>Counsel Brief: Open-Source Call Defense Software</h1>
+<div class="sub">Project "anticall" (working name CallShield Network, not trademark-cleared) &middot; github.com/Gr0wthHacker/anticall &middot; Oct 27, 2026 &middot; DRAFT, not legal advice</div>
+
+<h2>What it is</h2>
+<p>Self-hostable, AGPL-3.0 software that (1) screens a user's own inbound calls, (2) helps the user send a documented do-not-call request to a <b>verified</b> company contact, and (3) builds an evidence file and drafts FTC/FCC/carrier complaints for the user to review and file. Pre-alpha; built on synthetic and mock telephony only.</p>
+<div class="box"><b>Built-in limits:</b> no auto-redial or bulk dialing; no calls to caller-ID-only numbers; each outbound call needs a separate user authorization plus cooldown and daily caps; the AI has no dial tool; live speech processing, outbound AI, agency submission and community sharing are all <b>off by default</b>; no output ever says a violation is proven or states damages.</div>
+
+<h2>Questions we need answered</h2>
+<ol>
+<li><b>Outbound calls (TCPA / TSR / 47 USC 223).</b> Is a user-initiated, single-purpose opt-out call to a verified business line, placed by an AI voice that discloses it is automated, permissible? Under what conditions (consent, disclosures, time limits, attempt caps)? Is repeated follow-up by the same user lawful, and where is the line to harassment?</li>
+<li><b>Recording and live AI processing.</b> For inbound screening and outbound calls, what consent or notice is required, by state and across state lines, for (a) live speech-to-text, (b) saving audio, (c) saving transcripts, (d) sending audio to a remote AI vendor? Please fill the jurisdiction matrix (all states currently "UNKNOWN").</li>
+<li><b>Developer and operator exposure.</b> What liability attaches to the maintainer who publishes source, a self-hoster, and any future hosted operator? Is the disclaimer wording adequate, and are any statements overclaiming?</li>
+<li><b>Licensing.</b> Confirm AGPL-3.0-only versus alternatives (e.g. Apache-2.0); compatibility of third-party models, voices and code; whether a separate acceptable-use policy can apply to hosted services only.</li>
+<li><b>Evidence and complaints.</b> Are our evidence labels (observed / claimed / inferred / user-attested) and export wording acceptable? Review the filing attestation text, the FCC/FTC/carrier templates, and whether any agency offers an approved submission channel (we currently only do manual handoff).</li>
+<li><b>Privacy.</b> State privacy and consumer-rights obligations for call metadata and stored media; retention defaults (metadata 90d, audio/transcripts 30d); deletion limits and legal holds; the required operator privacy notice.</li>
+<li><b>Community sharing (later).</b> Defamation and false-attribution risk, minimum anonymity standards, takedown process.</li>
+<li><b>Entity, name, insurance.</b> Recommended entity structure, trademark clearance of the name, and insurance.</li>
+<li><b>Provider terms.</b> Do SIP and AI vendors permit automated/AI-voice calling under their terms?</li>
+</ol>
+
+<h2>Decisions we need from counsel (open log D-001 to D-008)</h2>
+<table><tr><th>ID</th><th>Decision</th><th>Our prototype default</th></tr>
+<tr><td>D-001</td><td>First telephony transport/provider</td><td>Asterisk + generic SIP trunk behind an adapter</td></tr>
+<tr><td>D-002</td><td>Live speech-to-text consent gate by jurisdiction</td><td>Deny unless consent and jurisdiction allow</td></tr>
+<tr><td>D-003</td><td>Hosted vs fully local processing</td><td>Local first</td></tr>
+<tr><td>D-004</td><td>AGPL-3.0-only vs permissive</td><td>AGPL-3.0-only (provisional)</td></tr>
+<tr><td>D-005</td><td>Incident-to-case match threshold</td><td>Conservative; human review for attribution</td></tr>
+<tr><td>D-006</td><td>FTC/FCC forms; any approved submission API</td><td>Manual handoff only</td></tr>
+<tr><td>D-007</td><td>Retention and deletion by jurisdiction</td><td>PRD design defaults</td></tr>
+<tr><td>D-008</td><td>Legal entity, trademark, insurance</td><td>None yet</td></tr></table>
+
+<h2>Documents to review (all marked DRAFT in the repo)</h2>
+<ul><li>docs/legal/: acknowledgment-v1, filing-attestation-v1, recording-consent-matrix, regulatory-notes, counsel-checklist, release-gates</li>
+<li>Root: DISCLAIMER.md, ACCEPTABLE_USE.md, PRIVACY.md, LICENSE, SECURITY.md</li>
+<li>Full spec: docs/prd/PRD_v3.md (Sections 12, 19 and 21, Appendices A&ndash;F)</li></ul>
+
+<h2>What we need back</h2>
+<p>Written sign-off or required changes on each numbered question, a filled recording matrix, answers to D-001 to D-008, and a go/no-go per capability: <b>(a)</b> inbound screening, <b>(b)</b> live transcription, <b>(c)</b> recording, <b>(d)</b> outbound human-only call, <b>(e)</b> outbound AI call, <b>(f)</b> agency submission, <b>(g)</b> hosted service. Until then, none of these is enabled for real use.</p>
+</body></html>
