@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+.tox/
+
+# Node
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+npm-debug.log*
+.turbo/
+
+# Env and secrets
+.env
+.env.*
+!env.example
+*.pem
+*.key
+secrets/
+
+# Databases
+*.sqlite
+*.sqlite3
+*.db
+
+# Evidence and media storage (never commit)
+evidence/
+evidence-storage/
+data/
+storage/
+exports/
+recordings/
+*.wav
+*.mp3
+*.ogg
+*.zip
+
+# Local tooling
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
+.claude/settings.local.json
+CLAUDE.local.md
+docker-compose.override.yml

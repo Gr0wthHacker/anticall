@@ -1,0 +1,32 @@
+name: Abuse report
+description: Report misuse of CallShield against a third party, or abuse of a maintainer-operated service
+labels: [abuse]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not post phone numbers, names, or personal details of private individuals. For sensitive detail use a private security advisory instead.
+        Maintainers do not supervise independent self-hosted instances and cannot act on a specific instance's calls. See ACCEPTABLE_USE.md.
+  - type: textarea
+    id: what
+    attributes:
+      label: What misuse occurred (no personal data)
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options:
+        - Harassment or repeated calling
+        - Caller ID spoofing
+        - Unlawful recording
+        - Fabricated complaint or report
+        - Code change that enables abuse
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence (links to code or public material only)

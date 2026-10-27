@@ -1,0 +1,17 @@
+# Dev override:
+#   docker compose -f infra/docker/docker-compose.yml -f infra/docker/docker-compose.dev.yml up --build
+services:
+  api:
+    environment:
+      CALLSHIELD_ENV: dev
+      CALLSHIELD_LOG_LEVEL: DEBUG
+    volumes:
+      - ../../apps/api/src:/app/src
+    command: ["uvicorn", "callshield.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", "/app/src"]
+
+  worker:
+    environment:
+      CALLSHIELD_ENV: dev
+      CALLSHIELD_LOG_LEVEL: DEBUG
+    volumes:
+      - ../../apps/api/src:/app/src

@@ -1,0 +1,16 @@
+name: Security issue (pointer only)
+description: Read this before reporting a vulnerability
+labels: [security-pointer]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not describe vulnerabilities in a public issue.**
+        Use GitHub private vulnerability reporting: Security tab > Report a vulnerability. See SECURITY.md for scope and response targets.
+        Use this form only to ask where to report, or to say you have sent a private advisory (no details).
+  - type: textarea
+    id: note
+    attributes:
+      label: Note (no vulnerability details)
+    validations:
+      required: true

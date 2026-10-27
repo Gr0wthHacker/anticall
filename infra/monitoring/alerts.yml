@@ -1,0 +1,32 @@
+# Minimal starter alerts. Metric names are proposed and must match what the app exports.
+groups:
+  - name: callshield
+    rules:
+      - alert: ApiDown
+        expr: up{job="callshield-api"} == 0
+        for: 2m
+        labels: {severity: critical}
+        annotations:
+          summary: API target is down
+      - alert: WorkerDown
+        expr: up{job="callshield-worker"} == 0
+        for: 5m
+        labels: {severity: warning}
+        annotations:
+          summary: Worker target is down
+      - alert: WebhookSignatureFailures
+        expr: increase(callshield_webhook_signature_failures_total[10m]) > 5
+        labels: {severity: warning}
+        annotations:
+          summary: Repeated provider webhook signature failures (possible probing or misconfiguration)
+      - alert: JobDeadLetterGrowing
+        expr: callshield_jobs_dead_letter > 0
+        for: 15m
+        labels: {severity: warning}
+        annotations:
+          summary: Jobs stuck in dead-letter queue; events may be unprocessed
+      - alert: OutboundAttemptBlockedSpike
+        expr: increase(callshield_outbound_policy_blocks_total[1h]) > 10
+        labels: {severity: info}
+        annotations:
+          summary: Many outbound attempts blocked by policy; review for misuse

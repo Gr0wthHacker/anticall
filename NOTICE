@@ -1,0 +1,17 @@
+CallShield Network
+Copyright (c) 2026 CallShield Network contributors
+
+Licensed under the GNU Affero General Public License, version 3 only
+(AGPL-3.0-only). See LICENSE. License choice is provisional pending counsel
+review (decision D-004). Copyright holder/entity: to be determined (D-008).
+
+Third-party software:
+This repository does not vendor third-party code. Dependencies are declared in
+apps/api/pyproject.toml and (when present) apps/dashboard/package.json and are
+distributed under their own licenses. Optional integrations (Asterisk, PostgreSQL,
+Redis, third-party STT/TTS/LLM models and voices) are separate works under their
+own terms. Their license compatibility must be reviewed before any binary or image
+distribution. An SBOM and license scan are required release gates
+(docs/legal/release-gates.md).
+
+"CallShield Network" is a working name and is not cleared for trademark use.

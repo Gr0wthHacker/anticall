@@ -1,0 +1,413 @@
+"""Domain enums. Persisted as strings: changing a value needs a migration (PRD 20.3).
+
+Deliberately absent: any "violation proven" assessment state and any state that
+equates an acknowledgment with suppression in the sender's system (PRD 5.2.1, 19.9).
+"""
+
+from __future__ import annotations
+
+from enum import StrEnum
+
+# ---------------------------------------------------------------- tenancy / auth
+
+
+class Role(StrEnum):
+    CONSUMER_SUBSCRIBER = "CONSUMER_SUBSCRIBER"
+    HOUSEHOLD_ADMIN = "HOUSEHOLD_ADMIN"
+    OPERATOR = "OPERATOR"
+    REVIEWER = "REVIEWER"
+
+
+class HostingMode(StrEnum):
+    SELF_HOSTED = "SELF_HOSTED"
+    HYBRID = "HYBRID"
+    MANAGED_HOSTED = "MANAGED_HOSTED"
+
+
+class ActorType(StrEnum):
+    USER = "USER"
+    SYSTEM = "SYSTEM"
+    WORKER = "WORKER"
+    PROVIDER = "PROVIDER"
+    MODEL = "MODEL"
+    REVIEWER = "REVIEWER"
+    OPERATOR = "OPERATOR"
+
+
+# ---------------------------------------------------------------- Defend
+
+
+class LineVerificationStatus(StrEnum):
+    UNVERIFIED = "UNVERIFIED"
+    PENDING = "PENDING"
+    VERIFIED = "VERIFIED"
+    FAILED = "FAILED"
+    REVOKED = "REVOKED"
+
+
+class CallDirection(StrEnum):
+    INBOUND = "INBOUND"
+    OUTBOUND = "OUTBOUND"
+
+
+class CallDisposition(StrEnum):
+    RECEIVED = "RECEIVED"
+    ANSWERED_BY_USER = "ANSWERED_BY_USER"
+    SCREENED = "SCREENED"
+    TRANSFERRED = "TRANSFERRED"
+    VOICEMAIL = "VOICEMAIL"
+    REJECTED = "REJECTED"
+    MISSED = "MISSED"
+    NO_ANSWER = "NO_ANSWER"
+    TIMED_OUT = "TIMED_OUT"
+    FALLBACK_ROUTED = "FALLBACK_ROUTED"
+    FAILED = "FAILED"
+    UNKNOWN = "UNKNOWN"
+
+
+class RoutingAction(StrEnum):
+    ALLOW = "ALLOW"
+    TRANSFER = "TRANSFER"
+    SCREEN = "SCREEN"
+    VOICEMAIL = "VOICEMAIL"
+    REJECT = "REJECT"
+    FALLBACK = "FALLBACK"
+
+
+class TrustedContactKind(StrEnum):
+    TRUSTED = "TRUSTED"
+    PERMITTED = "PERMITTED"
+    KNOWN_UNWANTED = "KNOWN_UNWANTED"
+    OVERRIDE = "OVERRIDE"
+
+
+class ClassificationLabel(StrEnum):
+    UNKNOWN = "UNKNOWN"
+    TRUSTED = "TRUSTED"
+    UNSOLICITED_SALES = "UNSOLICITED_SALES"
+    SPAM_SUSPECTED = "SPAM_SUSPECTED"
+    SCAM_SUSPECTED = "SCAM_SUSPECTED"
+    DEBT_COLLECTION = "DEBT_COLLECTION"
+    SURVEY = "SURVEY"
+    INFORMATIONAL = "INFORMATIONAL"
+    URGENT_MEDICAL = "URGENT_MEDICAL"
+    URGENT_SCHOOL = "URGENT_SCHOOL"
+    URGENT_FAMILY = "URGENT_FAMILY"
+    EMERGENCY = "EMERGENCY"
+    OTHER = "OTHER"
+
+
+URGENT_LABELS: frozenset[ClassificationLabel] = frozenset(
+    {
+        ClassificationLabel.URGENT_MEDICAL,
+        ClassificationLabel.URGENT_SCHOOL,
+        ClassificationLabel.URGENT_FAMILY,
+        ClassificationLabel.EMERGENCY,
+    }
+)
+
+
+class ReviewStatus(StrEnum):
+    UNREVIEWED = "UNREVIEWED"
+    CONFIRMED = "CONFIRMED"
+    CORRECTED = "CORRECTED"
+    REJECTED = "REJECTED"
+
+
+class ProcessingMode(StrEnum):
+    """Consent processing mode (PRD 11.3): live processing and persistence are separate gates."""
+
+    METADATA_ONLY = "METADATA_ONLY"
+    LIVE_STT_TRANSIENT = "LIVE_STT_TRANSIENT"
+    TRANSCRIPT_RETAINED = "TRANSCRIPT_RETAINED"
+    RECORDING_RETAINED = "RECORDING_RETAINED"
+
+
+class StatementType(StrEnum):
+    SELLER_NAME = "SELLER_NAME"
+    PURPOSE = "PURPOSE"
+    CALLBACK_NUMBER = "CALLBACK_NUMBER"
+    PROMISE = "PROMISE"
+    ACKNOWLEDGEMENT = "ACKNOWLEDGEMENT"
+    OTHER = "OTHER"
+
+
+class VerificationStatus(StrEnum):
+    UNVERIFIED = "UNVERIFIED"
+    VERIFIED = "VERIFIED"
+    DISPUTED = "DISPUTED"
+    REJECTED = "REJECTED"
+
+
+class IncidentStatus(StrEnum):
+    CANDIDATE = "CANDIDATE"
+    LINKED = "LINKED"
+    DISMISSED = "DISMISSED"
+
+
+# ---------------------------------------------------------------- evidence (19.4)
+
+
+class EvidenceLabel(StrEnum):
+    OBSERVED = "OBSERVED"
+    CLAIMED = "CLAIMED"
+    MODEL_INFERRED = "MODEL_INFERRED"
+    USER_ATTESTED = "USER_ATTESTED"
+    EXTERNALLY_VERIFIED = "EXTERNALLY_VERIFIED"
+
+
+class EvidenceOrigin(StrEnum):
+    """Original vs derived taxonomy (ENF-002). Never silently overwritten."""
+
+    ORIGINAL = "ORIGINAL"
+    DERIVED = "DERIVED"
+    USER_STATED = "USER_STATED"
+    CALLER_CLAIMED = "CALLER_CLAIMED"
+    INFERRED = "INFERRED"
+    EXTERNAL_DOCUMENTARY = "EXTERNAL_DOCUMENTARY"
+
+
+class EvidenceType(StrEnum):
+    SIGNALING_METADATA = "SIGNALING_METADATA"
+    OBSERVED_CLI = "OBSERVED_CLI"
+    STIR_SHAKEN = "STIR_SHAKEN"
+    AI_TRANSCRIPT = "AI_TRANSCRIPT"
+    AUDIO_RECORDING = "AUDIO_RECORDING"
+    CALLER_CLAIM = "CALLER_CLAIM"
+    USER_DNC_INSTRUCTION = "USER_DNC_INSTRUCTION"
+    OPERATOR_ACKNOWLEDGEMENT = "OPERATOR_ACKNOWLEDGEMENT"
+    CORRELATED_CALL = "CORRELATED_CALL"
+    BUSINESS_CONFIRMATION = "BUSINESS_CONFIRMATION"
+    AGENCY_RECEIPT = "AGENCY_RECEIPT"
+    SCREENSHOT = "SCREENSHOT"
+    UPLOADED_DOCUMENT = "UPLOADED_DOCUMENT"
+    USER_STATEMENT = "USER_STATEMENT"
+
+
+class AuthorizationState(StrEnum):
+    """processing_authorization / sharing_authorization on evidence artifacts."""
+
+    NOT_EVALUATED = "NOT_EVALUATED"
+    PERMITTED = "PERMITTED"
+    DENIED = "DENIED"
+    REVOKED = "REVOKED"
+
+
+class RedactionState(StrEnum):
+    NONE = "NONE"
+    REDACTED_DERIVATIVE = "REDACTED_DERIVATIVE"
+
+
+# ---------------------------------------------------------------- Resolve
+
+
+class DestinationProvenance(StrEnum):
+    INDEPENDENTLY_VERIFIED = "INDEPENDENTLY_VERIFIED"
+    USER_PROVIDED_UNVERIFIED = "USER_PROVIDED_UNVERIFIED"
+    CALLER_ID_ONLY = "CALLER_ID_ONLY"
+
+
+class ContactOutcome(StrEnum):
+    """R-007."""
+
+    NO_ANSWER = "NO_ANSWER"
+    IVR_FAILED = "IVR_FAILED"
+    DROPPED = "DROPPED"
+    WRONG_DESTINATION = "WRONG_DESTINATION"
+    AGENT_CONNECTED = "AGENT_CONNECTED"
+    REQUEST_DELIVERED = "REQUEST_DELIVERED"
+    ACKNOWLEDGED = "ACKNOWLEDGED"
+    REFUSED = "REFUSED"
+    REFERRED_TO_CHANNEL = "REFERRED_TO_CHANNEL"
+    UNRESOLVED = "UNRESOLVED"
+    VERIFIED_RESOLVED = "VERIFIED_RESOLVED"
+    USER_ABORTED = "USER_ABORTED"
+
+
+class ResolutionState(StrEnum):
+    """PRD 5.2.1. There is intentionally no SUPPRESSED_IN_SENDER_SYSTEM state."""
+
+    CREATED = "CREATED"
+    DESTINATION_REVIEW = "DESTINATION_REVIEW"
+    VERIFIED_DESTINATION = "VERIFIED_DESTINATION"
+    USER_APPROVED_CONTACT = "USER_APPROVED_CONTACT"
+    IN_PROGRESS = "IN_PROGRESS"
+    REQUEST_DELIVERED = "REQUEST_DELIVERED"
+    ACKNOWLEDGED = "ACKNOWLEDGED"
+    UNCONFIRMED = "UNCONFIRMED"
+    REFUSED = "REFUSED"
+    INTERRUPTED = "INTERRUPTED"
+    MONITORING = "MONITORING"
+    NEXT_STEP_REVIEW = "NEXT_STEP_REVIEW"
+    POSSIBLE_RECONTACT = "POSSIBLE_RECONTACT"
+    ATTRIBUTION_REVIEW = "ATTRIBUTION_REVIEW"
+    REOPENED = "REOPENED"
+    NOT_RELATED = "NOT_RELATED"
+    CLOSED = "CLOSED"
+
+
+class OptOutStatus(StrEnum):
+    DRAFTED = "DRAFTED"
+    DELIVERED = "DELIVERED"
+    ACKNOWLEDGED = "ACKNOWLEDGED"
+    REFUSED = "REFUSED"
+    UNCONFIRMED = "UNCONFIRMED"
+    CESSATION_OBSERVED = "CESSATION_OBSERVED"
+
+
+class ContactScope(StrEnum):
+    OUTBOUND_CALL_ONCE = "OUTBOUND_CALL_ONCE"
+    OUTBOUND_CALL_SUPERVISED = "OUTBOUND_CALL_SUPERVISED"
+
+
+class Urgency(StrEnum):
+    LOW = "LOW"
+    NORMAL = "NORMAL"
+    HIGH = "HIGH"
+
+
+# ---------------------------------------------------------------- Enforce (19.3, 19.9)
+
+
+class EnforceCaseState(StrEnum):
+    OPENED = "OPENED"
+    INTAKE = "INTAKE"
+    EVIDENCE_COLLECTING = "EVIDENCE_COLLECTING"
+    REVIEW_REQUIRED = "REVIEW_REQUIRED"
+    ELIGIBLE_TO_DRAFT = "ELIGIBLE_TO_DRAFT"
+    DRAFT_READY = "DRAFT_READY"
+    USER_APPROVED = "USER_APPROVED"
+    EXTERNAL_SUBMISSION_REQUIRED = "EXTERNAL_SUBMISSION_REQUIRED"
+    SUBMISSION_IN_PROGRESS = "SUBMISSION_IN_PROGRESS"
+    SUBMITTED = "SUBMITTED"
+    SUBMISSION_FAILED = "SUBMISSION_FAILED"
+    AGENCY_ACKNOWLEDGED = "AGENCY_ACKNOWLEDGED"
+    MONITORING = "MONITORING"
+    SUPPLEMENT_PENDING = "SUPPLEMENT_PENDING"
+    CLOSED = "CLOSED"
+
+
+class AttributionStatus(StrEnum):
+    UNKNOWN = "UNKNOWN"
+    CANDIDATE = "CANDIDATE"
+    CORROBORATED = "CORROBORATED"
+    DISPUTED = "DISPUTED"
+
+
+class RecordingAuthorization(StrEnum):
+    NOT_EVALUATED = "NOT_EVALUATED"
+    PERMITTED = "PERMITTED"
+    DENIED = "DENIED"
+
+
+class LegalAssessment(StrEnum):
+    NOT_REVIEWED = "NOT_REVIEWED"
+    POTENTIALLY_RELEVANT = "POTENTIALLY_RELEVANT"
+    COUNSEL_REVIEWED = "COUNSEL_REVIEWED"
+
+
+class CaseResolution(StrEnum):
+    UNRESOLVED = "UNRESOLVED"
+    REQUEST_ACKNOWLEDGED = "REQUEST_ACKNOWLEDGED"
+    CONTACT_STOPPED = "CONTACT_STOPPED"
+    UNKNOWN = "UNKNOWN"
+
+
+class LinkageType(StrEnum):
+    """Append-only: latest row per (case, incident) wins. Corrections never delete."""
+
+    AUTO_MATCH = "AUTO_MATCH"
+    USER_LINK = "USER_LINK"
+    USER_UNLINK = "USER_UNLINK"
+    REVIEWER_LINK = "REVIEWER_LINK"
+    REVIEWER_UNLINK = "REVIEWER_UNLINK"
+
+
+class AssessmentStatus(StrEnum):
+    """PRD 19.9. VIOLATION_PROVEN must never exist."""
+
+    INSUFFICIENT_INFORMATION = "INSUFFICIENT_INFORMATION"
+    POSSIBLY_RELEVANT = "POSSIBLY_RELEVANT"
+    REQUIRES_COUNSEL_REVIEW = "REQUIRES_COUNSEL_REVIEW"
+    NOT_SUPPORTED_BY_CURRENT_EVIDENCE = "NOT_SUPPORTED_BY_CURRENT_EVIDENCE"
+
+
+class IssueType(StrEnum):
+    DNC_ENTITY_SPECIFIC = "DNC_ENTITY_SPECIFIC"
+    DNC_REGISTRY = "DNC_REGISTRY"
+    AUTOMATED_OR_PRERECORDED_CALL = "AUTOMATED_OR_PRERECORDED_CALL"
+    TELEMARKETING_SALES_RULE = "TELEMARKETING_SALES_RULE"
+    STATE_LAW = "STATE_LAW"
+    CALLER_ID_SPOOFING = "CALLER_ID_SPOOFING"
+    OTHER = "OTHER"
+
+
+class Agency(StrEnum):
+    FCC = "FCC"
+    FTC = "FTC"
+    CARRIER = "CARRIER"
+    STATE_AG = "STATE_AG"
+    OTHER = "OTHER"
+
+
+class AdapterMethod(StrEnum):
+    DOCUMENTED_API = "documented_api"
+    MANUAL_HANDOFF = "manual_handoff"
+
+
+class FilingDraftReviewState(StrEnum):
+    DRAFT = "DRAFT"
+    NEEDS_REVIEW = "NEEDS_REVIEW"
+    REVIEWED = "REVIEWED"
+    APPROVED = "APPROVED"
+    SUPERSEDED = "SUPERSEDED"
+    WITHDRAWN = "WITHDRAWN"
+
+
+class SubmissionState(StrEnum):
+    """Never invent a receipt: UNKNOWN is used for ambiguous transport outcomes."""
+
+    PENDING = "PENDING"
+    IN_PROGRESS = "IN_PROGRESS"
+    SUBMITTED = "SUBMITTED"
+    AGENCY_ACKNOWLEDGED = "AGENCY_ACKNOWLEDGED"
+    FAILED = "FAILED"
+    UNKNOWN = "UNKNOWN"
+    EXTERNAL_SUBMISSION_REQUIRED = "EXTERNAL_SUBMISSION_REQUIRED"
+    UNSUPPORTED_DESTINATION = "UNSUPPORTED_DESTINATION"
+
+
+class ComplaintReviewState(StrEnum):
+    DRAFT = "DRAFT"
+    USER_REVIEWING = "USER_REVIEWING"
+    USER_APPROVED = "USER_APPROVED"
+    DISCARDED = "DISCARDED"
+
+
+class CampaignReviewState(StrEnum):
+    CANDIDATE = "CANDIDATE"
+    UNDER_REVIEW = "UNDER_REVIEW"
+    CONFIRMED = "CONFIRMED"
+    REJECTED = "REJECTED"
+    UNLINKED = "UNLINKED"
+
+
+# ---------------------------------------------------------------- platform
+
+
+class EventOrigin(StrEnum):
+    PROVIDER_WEBHOOK = "PROVIDER_WEBHOOK"
+    ASTERISK = "ASTERISK"
+    USER_ACTION = "USER_ACTION"
+    SYSTEM = "SYSTEM"
+    WORKER = "WORKER"
+    MODEL = "MODEL"
+    USER_IMPORT = "USER_IMPORT"
+
+
+class JobState(StrEnum):
+    QUEUED = "QUEUED"
+    RUNNING = "RUNNING"
+    SUCCEEDED = "SUCCEEDED"
+    FAILED = "FAILED"
+    DEAD = "DEAD"

@@ -1,0 +1,22 @@
+{
+  "id": "acknowledgment",
+  "version": "v1",
+  "status": "DRAFT_NOT_COUNSEL_REVIEWED",
+  "source": "PRD_v3 Appendix B",
+  "notice": "Draft. Not legal advice. Use only after counsel review and enforceability check.",
+  "preamble": "Before activating telephony features, I acknowledge that:",
+  "all_required": true,
+  "default_checked": false,
+  "record_fields": ["accepted_at_utc", "acknowledgment_version", "text_sha256", "operator_id"],
+  "items": [
+    {"id": "line_control", "required": true, "text": "I control or am authorized to manage the telephone lines connected to this installation."},
+    {"id": "legal_compliance", "required": true, "text": "I am responsible for obtaining necessary permissions and complying with applicable law and carrier/provider terms."},
+    {"id": "caller_id_unreliable", "required": true, "text": "Displayed caller ID may be false or spoofed and does not, by itself, identify a responsible organization."},
+    {"id": "ai_may_err", "required": true, "text": "AI-generated assessments may be incorrect; I must review consequential outcomes."},
+    {"id": "recording_consent", "required": true, "text": "Recording, transcription, and live AI processing may require additional disclosures and consents."},
+    {"id": "no_suppression_guarantee", "required": true, "text": "A removal request or verbal acknowledgment does not guarantee suppression of further calling."},
+    {"id": "no_harassment", "required": true, "text": "Repeated contacts made to harass, intimidate, or disrupt a destination are not authorized by the project's intended workflows."},
+    {"id": "experimental", "required": true, "text": "I understand that the project is experimental and can lose or mishandle calls if misconfigured."},
+    {"id": "documents_reviewed", "required": true, "text": "I have reviewed the license, disclaimer, privacy notice, and any applicable service terms."}
+  ]
+}

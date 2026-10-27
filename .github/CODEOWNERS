@@ -1,0 +1,31 @@
+# Ownership per PRD 20.3: security owner for telephony outbound; privacy owner for
+# recording and federation; legal reviewer for templates and filing adapters.
+# All roles currently map to the sole maintainer. Split when more maintainers exist.
+
+* @Gr0wthHacker
+
+# Security: telephony, outbound, AI tools, auth, policy gates, CI guard
+/apps/api/src/callshield/auth/ @Gr0wthHacker
+/apps/api/src/callshield/ai_agent/ @Gr0wthHacker
+/packages/ai-agent/ @Gr0wthHacker
+/packages/telephony-core/ @Gr0wthHacker
+/packages/policy-engine/ @Gr0wthHacker
+/integrations/ @Gr0wthHacker
+/scripts/policy_guard.py @Gr0wthHacker
+/.github/ @Gr0wthHacker
+/infra/ @Gr0wthHacker
+/SECURITY.md @Gr0wthHacker
+/AGENTS.md @Gr0wthHacker
+
+# Privacy: recording, retention, data flows, federation
+/PRIVACY.md @Gr0wthHacker
+/docs/privacy/ @Gr0wthHacker
+/packages/evidence/ @Gr0wthHacker
+
+# Legal: templates, filing adapters, license and disclaimers
+/docs/legal/ @Gr0wthHacker
+/LICENSE @Gr0wthHacker
+/NOTICE @Gr0wthHacker
+/DISCLAIMER.md @Gr0wthHacker
+/ACCEPTABLE_USE.md @Gr0wthHacker
+/tests/legal-policy/ @Gr0wthHacker
