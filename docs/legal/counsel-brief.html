@@ -11,12 +11,12 @@ table{border-collapse:collapse;width:100%;margin-top:4px}td,th{border:1px solid 
 <div class="sub">Project "anticall" (working name CallShield Network, not trademark-cleared) &middot; github.com/Gr0wthHacker/anticall &middot; Oct 27, 2026 &middot; DRAFT, not legal advice</div>
 
 <h2>What it is</h2>
-<p>Self-hostable, AGPL-3.0 software that (1) screens a user's own inbound calls, (2) helps the user send a documented do-not-call request to a <b>verified</b> company contact, and (3) builds an evidence file and drafts FTC/FCC/carrier complaints for the user to review and file. Pre-alpha; built on synthetic and mock telephony only.</p>
-<div class="box"><b>Built-in limits:</b> no auto-redial or bulk dialing; no calls to caller-ID-only numbers; each outbound call needs a separate user authorization plus cooldown and daily caps; the AI has no dial tool; live speech processing, outbound AI, agency submission and community sharing are all <b>off by default</b>; no output ever says a violation is proven or states damages.</div>
+<p>Self-hostable, AGPL-3.0 software that (1) screens a user's own inbound calls, (2) lets the user authorize an automated <b>callback</b> to a recent spam caller to identify who is behind the call (company, seller, transfer target), and (3) builds an evidence file and drafts FTC/FCC/carrier complaints for the user to review and file. Pre-alpha; built on synthetic and mock telephony only.</p>
+<div class="box"><b>Built-in limits:</b> no auto-redial or bulk dialing; callbacks only to a logged inbound caller with STIR/SHAKEN attestation A, within 72h, 8am&ndash;9pm, one user tap each, max 2 per number per 30 days, 5 per user per day, 3 per number across the instance; the callee hears a fixed &ldquo;automated assistant&rdquo; disclosure before any question; wrong-number or stop-calling blocklists the number permanently; no voice biometrics; local processing only; the AI has no dial tool; live speech processing, outbound AI, agency submission and community sharing are all <b>off by default</b>; no output ever says a violation is proven or states damages.</div>
 
 <h2>Questions we need answered</h2>
 <ol>
-<li><b>Outbound calls (TCPA / TSR / 47 USC 223).</b> Is a user-initiated, single-purpose opt-out call to a verified business line, placed by an AI voice that discloses it is automated, permissible? Under what conditions (consent, disclosures, time limits, attempt caps)? Is repeated follow-up by the same user lawful, and where is the line to harassment?</li>
+<li><b>Callbacks (gates G1&ndash;G5, table below).</b> Is a single disclosed, automated return call to a number that called the user lawful (47 USC 227(b) consent theory, state automated-dialer laws, 47 USC 223)? How much exposure arises if an A-attested number was spoofed? What attempt caps and disclosure wording do you require?</li>
 <li><b>Recording and live AI processing.</b> For inbound screening and outbound calls, what consent or notice is required, by state and across state lines, for (a) live speech-to-text, (b) saving audio, (c) saving transcripts, (d) sending audio to a remote AI vendor? Please fill the jurisdiction matrix (all states currently "UNKNOWN").</li>
 <li><b>Developer and operator exposure.</b> What liability attaches to the maintainer who publishes source, a self-hoster, and any future hosted operator? Is the disclaimer wording adequate, and are any statements overclaiming?</li>
 <li><b>Licensing.</b> Confirm AGPL-3.0-only versus alternatives (e.g. Apache-2.0); compatibility of third-party models, voices and code; whether a separate acceptable-use policy can apply to hosted services only.</li>
@@ -26,6 +26,14 @@ table{border-collapse:collapse;width:100%;margin-top:4px}td,th{border:1px solid 
 <li><b>Entity, name, insurance.</b> Recommended entity structure, trademark clearance of the name, and insurance.</li>
 <li><b>Provider terms.</b> Do SIP and AI vendors permit automated/AI-voice calling under their terms?</li>
 </ol>
+
+<h2>Callback release gates (all OPEN, all block shipping)</h2>
+<table><tr><th>Gate</th><th>Blocks</th><th>Question</th></tr>
+<tr><td>G1 Consent theory</td><td>All callbacks</td><td>Does an inbound call give implied prior express consent under 47 USC 227(b) for one disclosed, automated return call?</td></tr>
+<tr><td>G2 Spoof exposure</td><td>All callbacks</td><td>Exposure if an A-attested number was still spoofed; is the A-attestation gate sufficient?</td></tr>
+<tr><td>G3 Listen window</td><td>Pre-disclosure extraction</td><td>Is live local extraction before disclosure, nothing stored, &ldquo;recording&rdquo; under all-party laws (e.g. Cal. Penal Code 632.7)? Fallback exists: disclose on answer.</td></tr>
+<tr><td>G4 State dialer laws</td><td>All callbacks</td><td>Do automated/prerecorded-message laws (Indiana first) apply to a noncommercial return call?</td></tr>
+<tr><td>G5 Provider terms</td><td>Provider choice</td><td>Do the SIP trunk and any model/voice vendors permit this use?</td></tr></table>
 
 <h2>Decisions we need from counsel (open log D-001 to D-008)</h2>
 <table><tr><th>ID</th><th>Decision</th><th>Our prototype default</th></tr>
@@ -44,5 +52,5 @@ table{border-collapse:collapse;width:100%;margin-top:4px}td,th{border:1px solid 
 <li>Full spec: docs/prd/PRD_v3.md (Sections 12, 19 and 21, Appendices A&ndash;F)</li></ul>
 
 <h2>What we need back</h2>
-<p>Written sign-off or required changes on each numbered question, a filled recording matrix, answers to D-001 to D-008, and a go/no-go per capability: <b>(a)</b> inbound screening, <b>(b)</b> live transcription, <b>(c)</b> recording, <b>(d)</b> outbound human-only call, <b>(e)</b> outbound AI call, <b>(f)</b> agency submission, <b>(g)</b> hosted service. Until then, none of these is enabled for real use.</p>
+<p>Written sign-off or required changes on each numbered question, a filled recording matrix, answers to D-001 to D-008, and a go/no-go per capability: <b>(a)</b> inbound screening, <b>(b)</b> live transcription, <b>(c)</b> recording, <b>(d)</b> automated callback, <b>(e)</b> pre-disclosure listen window, <b>(f)</b> agency submission, <b>(g)</b> hosted service. Until then, none of these is enabled for real use.</p>
 </body></html>

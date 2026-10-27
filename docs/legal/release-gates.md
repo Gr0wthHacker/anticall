@@ -8,8 +8,8 @@
 - [ ] Authorized processing of media under jurisdictional policy
 - [ ] Inbound screening, user transfer, and fallback tested
 - [ ] Controlled IVR/DTMF path can reach agent through option 2
-- [ ] User-initiated outbound agent clearly discloses role and request
-- [ ] Every contact associated with a real case, verified destination, and recorded authorization
+- [ ] Callback agent discloses it is automated as its first utterance (replaces PRD v3 outbound opt-out; see callback gates below)
+- [ ] Every callback tied to a logged inbound call, passing all seven eligibility gates, with a recorded one-tap authorization
 - [ ] Further calls never form an unchecked redial sequence
 - [ ] Source provenance and user corrections implemented
 - [ ] High-impact hallucination, spoofing, and privacy failure tests passed
