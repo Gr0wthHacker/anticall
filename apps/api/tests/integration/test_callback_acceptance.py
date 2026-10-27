@@ -254,12 +254,16 @@ def test_ac08_bare_hello_disclosure_starts_within_1_5_seconds_of_silence(cb: CbE
 
 # 9 ------------------------------------------------------------------------------------
 @pytest.mark.parametrize("scenario", ["wrong_number_listen", "wrong_number_after"])
-def test_ac09_wrong_number_apology_hangup_instance_blocklist_no_further_callbacks(
+def test_ac09_wrong_number_hangup_instance_blocklist_no_further_callbacks(
     cb: CbEnv, scenario: str
 ) -> None:
     body = ran(cb, scenario)
     handle = cb.dialer.handles[0]
-    assert handle.spoken[-1] == "Sorry for the trouble, goodbye" and handle.hung_up
+    assert handle.hung_up
+    if scenario == "wrong_number_listen":
+        assert handle.spoken == []  # pre-disclosure hard stop is silent
+    else:
+        assert handle.spoken[-1] == "Sorry for the trouble, goodbye"
     assert body["result"]["outcome"] == "HARD_STOP"
     assert body["result"]["fields"]["wrong_party"] == {"value": True, "label": "CLAIMED"}
     with cb.session() as s:

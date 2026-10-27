@@ -172,9 +172,15 @@ def test_no_answer_and_busy() -> None:
         ("stop_calling", False, True),
     ],
 )
-def test_hard_stop_apology_then_hangup(scenario: str, wrong: bool, stop: bool) -> None:
+def test_hard_stop_hangs_up_and_apologises_only_after_disclosure(
+    scenario: str, wrong: bool, stop: bool
+) -> None:
     result, handle = run(scenario)
-    assert handle.spoken[-1] == utter.APOLOGY and handle.hung_up
+    assert handle.hung_up
+    if result.disclosed:
+        assert handle.spoken[-1] == utter.APOLOGY
+    else:
+        assert utter.APOLOGY not in handle.spoken
     assert result.outcome is Outcome.HARD_STOP and result.hard_stop is not None
     assert (result.wrong_party, result.stop_requested) == (wrong, stop)
     assert utter.CLOSING not in handle.spoken and result.questions_asked == []
@@ -183,10 +189,10 @@ def test_hard_stop_apology_then_hangup(scenario: str, wrong: bool, stop: bool) -
 @pytest.mark.parametrize(
     "line", ["I'll call the police if you call again", "Help me, I'm scared", "We didn't call you"]
 )
-def test_hard_stop_in_listen_window_speaks_only_the_apology(line: str) -> None:
+def test_hard_stop_in_listen_window_is_silent_and_hangs_up(line: str) -> None:
     result, handle = run(scripted([ev(ANSWERED, 0.5), say(line, 3.0, 2.0)]))
-    assert handle.spoken == [utter.APOLOGY] and handle.hung_up
-    assert not result.disclosed
+    assert handle.spoken == [] and handle.hung_up
+    assert not result.disclosed and result.hard_stop is not None
 
 
 def test_hard_stop_is_checked_continuously_after_disclosure() -> None:

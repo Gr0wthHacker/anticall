@@ -3,7 +3,7 @@
 Driven entirely by `MediaEvent`s from the dialer handle on a virtual clock
 (`offset_seconds`). Guarantees enforced here, in code:
 
-* No speech before the disclosure, except the fixed hard-stop apology.
+* No speech before the disclosure at all; a hard stop before it hangs up silently.
 * IVRs are navigated with DTMF only; speech-only menus end the call (`ivr_speech_only`).
 * Voicemail: hang up, say nothing (`voicemail`).
 * The listen window lives in `EphemeralListenBuffer`; it is discarded the instant the
@@ -414,7 +414,8 @@ class CallbackSession:
         self.result.hard_stop = stop
         self.result.wrong_party = stop.kind is HardStopKind.WRONG_PARTY
         self.result.stop_requested = stop.kind is HardStopKind.STOP_REQUESTED
-        self._say(utter.APOLOGY)
+        if self.result.disclosed:
+            self._say(utter.APOLOGY)
         self._end(Outcome.HARD_STOP)
         return True
 

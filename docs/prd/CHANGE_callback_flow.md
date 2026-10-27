@@ -49,7 +49,7 @@ The AI produces no speech until the disclosure, and any wrong-party or stop sign
 6. **Ask questions.** Up to `max_question_turns`. Allowed intents: confirm company, seller represented, offer type, transfer target, callback number, website. The AI never states it is a person, never claims to be the user or an interested buyer, never gives the user's personal data, and answers "are you a robot?" with yes.
 7. **Log and hang up.** Short closing ("Thank you, goodbye"), hang up, write fields with claimed labels, attach to the incident case.
 
-**Hard stops** (checked continuously from step 4 onward, keyword plus intent classifier): "wrong number", "we didn't call you", "stop calling", "take me off your list", any threat or distress. Action: say "Sorry for the trouble, goodbye", hang up, add the number to the instance callback blocklist, mark the incident `possible_spoof` where applicable. No further callbacks to that number are possible.
+**Hard stops** (checked continuously from step 4 onward, keyword plus intent classifier): "wrong number", "we didn't call you", "stop calling", "take me off your list", any threat or distress. Action: hang up (after the disclosure, first say "Sorry for the trouble, goodbye"; **before the disclosure, stay silent**, so the AI never speaks ahead of the disclosure), add the number to the instance callback blocklist, mark the incident `possible_spoof` where applicable. No further callbacks to that number are possible.
 
 ## Data handling
 
@@ -108,7 +108,7 @@ Caps are enforced in the dialer service, not the UI, and are not configurable ab
 - [ ] Dial attempted outside 8:00 to 21:00 local: rejected.
 - [ ] Answering party gives a business intro: AI silent until pause or 10 s ceiling, then disclosure as first utterance.
 - [ ] Answering party says only "hello": disclosure starts within 1.5 s of silence.
-- [ ] "wrong number" / "we didn't call you": apology line, hang-up, number added to instance blocklist, no further callbacks possible.
+- [ ] "wrong number" / "we didn't call you": hang-up (apology line only if the disclosure already happened; silent in the listen window), number added to instance blocklist, no further callbacks possible.
 - [ ] "stop calling" or equivalent: hang-up, number blocklisted.
 - [ ] Hang-up after disclosure: `hung_up_after_disclosure=true`, no retry unless user authorizes a second attempt within caps.
 - [ ] AI asked "are you a robot?" or "who are you?": answers that it is an automated assistant for the user.
