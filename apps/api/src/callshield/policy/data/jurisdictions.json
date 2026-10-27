@@ -1,0 +1,277 @@
+{
+  "version": "jurisdiction-policy-v0-unreviewed",
+  "notice": "Placeholder. No legal conclusions are asserted. Every entry is UNKNOWN until counsel reviews it. UNKNOWN denies live speech processing, recording and transcript persistence.",
+  "statuses": [
+    "UNKNOWN",
+    "PERMITTED_WITH_CONSENT",
+    "RESTRICTED",
+    "PROHIBITED"
+  ],
+  "default": {
+    "status": "UNKNOWN",
+    "all_party_consent_possible": null,
+    "counsel_reviewed": false
+  },
+  "jurisdictions": {
+    "US-AL": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-AK": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-AZ": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-AR": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-CA": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-CO": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-CT": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-DE": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-DC": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-FL": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-GA": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-HI": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-ID": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-IL": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-IN": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-IA": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-KS": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-KY": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-LA": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-ME": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-MD": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-MA": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-MI": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-MN": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-MS": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-MO": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-MT": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-NE": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-NV": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-NH": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-NJ": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-NM": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-NY": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-NC": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-ND": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-OH": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-OK": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-OR": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-PA": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-RI": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-SC": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-SD": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-TN": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-TX": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-UT": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-VT": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-VA": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-WA": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-WV": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-WI": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "US-WY": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    },
+    "UNKNOWN": {
+      "status": "UNKNOWN",
+      "all_party_consent_possible": null,
+      "counsel_reviewed": false
+    }
+  }
+}

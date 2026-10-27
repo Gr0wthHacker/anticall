@@ -36,11 +36,15 @@ secrets/
 *.db
 
 # Evidence and media storage (never commit)
-evidence/
-evidence-storage/
-data/
-storage/
-exports/
+/evidence/
+/evidence-storage/
+/data/
+/storage/
+/exports/
+/apps/api/evidence/
+/apps/api/data/
+/apps/api/storage/
+/apps/api/exports/
 recordings/
 *.wav
 *.mp3
