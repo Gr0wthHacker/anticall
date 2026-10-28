@@ -68,7 +68,9 @@ def _check_locked(settings_like: Any) -> None:
 class CallbackSettings(BaseSettings):
     """Instance-level defaults (env). Per-tenant/user overrides are layered on top."""
 
-    model_config = SettingsConfigDict(env_prefix="CALLSHIELD_CALLBACK_", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_prefix="CALLSHIELD_CALLBACK_", env_file=".env", extra="ignore"
+    )
 
     callback_enabled: bool = False
     callback_window_hours: int = Field(72, ge=1, le=168)

@@ -179,10 +179,26 @@ def process_webhook(
     except MalformedEventError as exc:
         logger.warning("webhook malformed line=%s", line.id)
         raise ApiError("malformed event", code="MALFORMED_EVENT") from exc
+    return dispatch_authenticated_event(session, settings, line, endpoint, adapter, event)
+
+
+def dispatch_authenticated_event(
+    session: Session,
+    settings: Settings,
+    line: ProtectedLine,
+    endpoint: LineEndpoint,
+    adapter: ProviderAdapter,
+    event: ProviderCallEvent,
+) -> IngestOutcome:
+    """Shared tail of every authenticated ingest path (signed webhooks, ARI websocket).
+
+    The caller has ALREADY authenticated the channel and resolved `line` from its own trusted
+    state; nothing in `event` can change the tenant. Idempotency, ledger, incident and job
+    creation all happen inside the dispatch handlers."""
     _check_addressed_to_line(event, line, endpoint)
     is_registration = event.event_type.value.startswith("registration.")
     if not is_registration and line.verification_status != LineVerificationStatus.VERIFIED.value:
         raise ForbiddenError("line is not verified", code="LINE_NOT_VERIFIED")
     outcome = _dispatch(session, settings, line, endpoint, event, adapter)
-    touch_health(session, line.tenant_id, provider)
+    touch_health(session, line.tenant_id, event.provider)
     return outcome

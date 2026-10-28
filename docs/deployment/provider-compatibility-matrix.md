@@ -12,6 +12,8 @@ Legend: `UNVERIFIED` (default), `CONFIRMED` (cite evidence), `NOT SUPPORTED`. Ev
 
 ## Notes
 
+- `callshield init` ships UNVERIFIED provider profiles (generic, Twilio Elastic SIP, Telnyx, Bandwidth, Flowroute, VoIP.ms, local harness) in `apps/api/src/callshield/providers/profiles.py`. They are templates, not entries in this matrix. Setup guide: [`connect-your-sip-trunk.md`](connect-your-sip-trunk.md).
+
 - Existing mobile numbers generally cannot be intercepted regardless of carrier (non-goal N7). Document a supported routing mode (forwarding, SIP-native number, or app) per row.
 - If a provider forbids automated calls, the outbound AI module must be disabled for that deployment (PRD 7.3).
 - Record webhook replay window and duplicate-delivery behavior for idempotency tests.

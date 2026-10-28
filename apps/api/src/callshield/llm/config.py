@@ -10,7 +10,7 @@ from callshield.llm.openai_compat import OpenAICompatibleClient
 
 
 class LLMSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="CALLSHIELD_LLM_", extra="ignore")
+    model_config = SettingsConfigDict(env_prefix="CALLSHIELD_LLM_", env_file=".env", extra="ignore")
 
     enabled: bool = False
     base_url: str = ""  # e.g. a local llama.cpp / Ollama / vLLM OpenAI-compatible endpoint

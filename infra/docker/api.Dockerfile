@@ -14,7 +14,8 @@ COPY apps/api/pyproject.toml ./pyproject.toml
 COPY apps/api/src ./src
 COPY apps/api/alembic ./alembic
 
-RUN pip install ".[postgres]" \
+ARG EXTRAS=postgres
+RUN pip install ".[${EXTRAS}]" \
  && mkdir -p /var/lib/callshield/evidence \
  && chown -R callshield:callshield /app /var/lib/callshield
 

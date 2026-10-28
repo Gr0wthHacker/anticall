@@ -7,8 +7,9 @@
 Nothing connects to a real carrier. Provider events are synthetic fixtures. Use fictional numbers (555-01xx).
 
 ```bash
-cp env.example .env
-# edit .env: replace every CHANGE_ME. Leave all *_ENABLED flags false.
+callshield init            # writes .env with generated secrets (or: cp env.example .env)
+# With the compose Postgres: set CALLSHIELD_DB_URL to the postgresql+psycopg URL shown in
+# docs/deployment/configuration-reference.md and replace every CHANGE_ME. Leave all flags false.
 docker compose -f infra/docker/docker-compose.yml --env-file .env up --build -d
 docker compose -f infra/docker/docker-compose.yml ps
 ```
@@ -36,6 +37,8 @@ Note: the compose files were authored without a Docker runtime available and hav
 - Programmatic complaint submission
 
 Before enabling any of these you need the relevant gate passed, counsel review for your jurisdiction, and a provider that permits the use.
+
+> `env.example` and [`configuration-reference.md`](configuration-reference.md) are generated from the settings classes (`apps/api/scripts/gen_config_reference.py`); a test fails if they go stale. Check an install with `callshield doctor`.
 
 ## Callback flow settings
 
@@ -84,8 +87,8 @@ Do not expose the API or dashboard directly. Put a reverse proxy (Caddy, nginx, 
 ## Secrets
 
 - `.env` is gitignored; never commit it. Use file permissions `600`.
-- Generate: `openssl rand -hex 32` for `CALLSHIELD_SECRET_KEY` and `CALLSHIELD_WEBHOOK_SIGNING_SECRET`.
-- Rotation: change the value, restart `api` and `worker`. Rotating `SECRET_KEY` invalidates sessions. Rotate the webhook secret in coordination with the provider (accept old and new during overlap if supported).
+- Generate: `openssl rand -hex 32` for `CALLSHIELD_JWT_SECRET` and `CALLSHIELD_WEBHOOK_SECRET` (`callshield init` does this for you).
+- Rotation: change the value, restart `api` and `worker`. Rotating `CALLSHIELD_JWT_SECRET` invalidates sessions. Rotate the webhook secret in coordination with the provider (accept old and new during overlap if supported).
 - Rotate immediately on suspected compromise, and also revoke SIP trunk credentials at the provider (PRD 7.3).
 - Rotate Postgres password by altering the role, updating `.env`, and restarting.
 - Consider a secrets manager (Docker/Compose secrets, SOPS) for anything beyond a single-user local install.

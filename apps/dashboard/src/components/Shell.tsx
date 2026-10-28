@@ -19,6 +19,7 @@ const NAV: { href: string; label: string }[] = [
   { href: "/rules", label: "Rules" },
   { href: "/settings", label: "Settings" },
   { href: "/health", label: "System Health" },
+  { href: "/setup", label: "Setup" },
 ];
 
 function isActive(pathname: string, href: string): boolean {

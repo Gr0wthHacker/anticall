@@ -95,16 +95,22 @@ docs/                prd, legal drafts, developer, deployment, privacy
 ## Quickstart (synthetic mode only)
 
 ```bash
-cp env.example .env              # every risky capability is false by default
-docker compose -f infra/docker/docker-compose.yml up --build
-# or, without Docker:
-cd apps/api && pip install -e ".[dev]" && pytest
+python -m venv apps/api/.venv && source apps/api/.venv/bin/activate   # Windows: .venv/Scripts/activate
+pip install -e "apps/api[dev]"
+cd apps/api
+callshield init          # wizard: every risky feature defaults to NO; secrets are generated
+callshield db upgrade
+callshield doctor        # PASS/WARN/FAIL with fix hints
+callshield run api       # http://127.0.0.1:8000
 ```
 
-Details and limits: [`docs/deployment/self-hosting.md`](docs/deployment/self-hosting.md). Use fictional numbers only (555-01xx).
+Then send a synthetic call and open the dashboard: [`docs/quickstart.md`](docs/quickstart.md) (about 10 minutes). Docker Compose: [`docs/deployment/self-hosting.md`](docs/deployment/self-hosting.md). Use fictional numbers only (555-01xx).
+
+Connecting a real SIP trunk (any provider; profiles are unverified templates): [`docs/deployment/connect-your-sip-trunk.md`](docs/deployment/connect-your-sip-trunk.md). Every setting: [`docs/deployment/configuration-reference.md`](docs/deployment/configuration-reference.md). Before real calls: [`docs/deployment/going-live-checklist.md`](docs/deployment/going-live-checklist.md).
 
 ## Documentation
 
+- Start here: [`docs/quickstart.md`](docs/quickstart.md), [`connect your SIP trunk`](docs/deployment/connect-your-sip-trunk.md), [`going live`](docs/deployment/going-live-checklist.md)
 - Spec: [`docs/prd/PRD_v3.md`](docs/prd/PRD_v3.md) (sections 19-22 control on conflict)
 - Legal drafts (not legal advice): [`docs/legal/`](docs/legal/)
 - Decisions: [`docs/developer/decision-log.md`](docs/developer/decision-log.md)

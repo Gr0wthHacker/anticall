@@ -52,10 +52,13 @@ _runtime: CallbackRuntime | None = None
 def build_default_runtime() -> CallbackRuntime:
     environment = get_settings().environment
     settings = CallbackSettings()
+    from callshield.telephony.asterisk.factory import select_callback_dialer
+
+    dialer = select_callback_dialer(get_settings())  # disabled unless CALLSHIELD_DIALER=asterisk
     keyer = DestinationKeyer(
         settings.hmac_secret.get_secret_value(), allow_dev_default=environment in ("dev", "test")
     )
-    return CallbackRuntime(settings=settings, keyer=keyer, environment=environment)
+    return CallbackRuntime(settings=settings, keyer=keyer, dialer=dialer, environment=environment)
 
 
 def get_runtime() -> CallbackRuntime:

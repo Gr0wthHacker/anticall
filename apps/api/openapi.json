@@ -1505,6 +1505,84 @@
         "title": "DestinationProvenance",
         "type": "string"
       },
+      "DoctorCheckOut": {
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "fix": {
+            "title": "Fix",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "status",
+          "detail",
+          "fix"
+        ],
+        "title": "DoctorCheckOut",
+        "type": "object"
+      },
+      "DoctorOut": {
+        "properties": {
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/DoctorCheckOut"
+            },
+            "title": "Checks",
+            "type": "array"
+          },
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Counts",
+            "type": "object"
+          },
+          "docs": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Docs",
+            "type": "object"
+          },
+          "gated_features": {
+            "items": {
+              "$ref": "#/components/schemas/GatedFeatureOut"
+            },
+            "title": "Gated Features",
+            "type": "array"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok",
+          "counts",
+          "checks",
+          "gated_features",
+          "docs"
+        ],
+        "title": "DoctorOut",
+        "type": "object"
+      },
       "DraftCreateRequest": {
         "additionalProperties": false,
         "properties": {
@@ -2049,6 +2127,44 @@
           "next_step"
         ],
         "title": "FilingOut",
+        "type": "object"
+      },
+      "GatedFeatureOut": {
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "env_var": {
+            "title": "Env Var",
+            "type": "string"
+          },
+          "gates": {
+            "title": "Gates",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "warning": {
+            "title": "Warning",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "env_var",
+          "title",
+          "enabled",
+          "gates",
+          "warning"
+        ],
+        "title": "GatedFeatureOut",
         "type": "object"
       },
       "HTTPValidationError": {
@@ -9719,6 +9835,32 @@
         "summary": "Put Rule",
         "tags": [
           "rules"
+        ]
+      }
+    },
+    "/v1/system/doctor": {
+      "get": {
+        "operationId": "system_doctor_v1_system_doctor_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoctorOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "System Doctor",
+        "tags": [
+          "system"
         ]
       }
     },

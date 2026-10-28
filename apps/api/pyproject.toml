@@ -22,6 +22,12 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.4", "mypy>=1.10"]
 postgres = ["psycopg[binary]>=3.1"]
+asterisk = ["aiohttp>=3.9"]
+voice = ["numpy>=1.26", "onnxruntime>=1.17", "faster-whisper>=1.0", "vosk>=0.3.45", "piper-tts>=1.2"]
+all = ["callshield[postgres,asterisk,voice]"]
+
+[project.scripts]
+callshield = "callshield.cli.main:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

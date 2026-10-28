@@ -94,17 +94,55 @@ services:
 
   asterisk:
     profiles: ["asterisk"]
-    # R0 test harness only. Image is not pinned by digest: pin before any non-local use.
-    image: andrius/asterisk:latest
+    build:
+      context: ../..
+      dockerfile: infra/docker/asterisk.Dockerfile
     restart: unless-stopped
-    volumes:
-      - ../../integrations/asterisk/pjsip.conf:/etc/asterisk/pjsip.conf:ro
-      - ../../integrations/asterisk/ari.conf:/etc/asterisk/ari.conf:ro
-      - ../../integrations/asterisk/http.conf:/etc/asterisk/http.conf:ro
-      - ../../integrations/asterisk/extensions.conf:/etc/asterisk/extensions.conf:ro
+    # Secrets (ARI password, trunk credentials) come from .env only: see env.example.
+    <<: *app-env
     ports:
+      # Everything binds to 127.0.0.1. A real trunk needs SIP/RTP reachable from the provider:
+      # see docs/deployment/asterisk.md before changing these (and firewall them).
       - "127.0.0.1:5060:5060/udp"
       - "127.0.0.1:8088:8088"
+      - "127.0.0.1:10000-10100:10000-10100/udp"
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/asterisk-healthcheck.sh"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # Long-running telephony process: ARI events -> Defend pipeline -> call control.
+  telephony:
+    profiles: ["asterisk"]
+    build:
+      context: ../..
+      dockerfile: infra/docker/api.Dockerfile
+      args:
+        EXTRAS: "postgres,asterisk"  # add ",voice" for local STT/TTS (large download)
+    restart: unless-stopped
+    <<: *app-env
+    command: ["python", "-m", "callshield.telephony.asterisk"]
+    environment:
+      CALLSHIELD_ASTERISK_ENABLED: "true"
+      CALLSHIELD_ASTERISK_ARI_URL: "http://asterisk:8088"
+      # Asterisk sends RTP to this name:port; we bind inside the container network only.
+      CALLSHIELD_ASTERISK_EXTERNAL_MEDIA_HOST: "telephony"
+      CALLSHIELD_ASTERISK_EXTERNAL_MEDIA_BIND: "0.0.0.0"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      asterisk:
+        condition: service_healthy
+    volumes:
+      - evidence:/var/lib/callshield/evidence
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8089/healthz', timeout=3).status == 200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
 volumes:
   pgdata:

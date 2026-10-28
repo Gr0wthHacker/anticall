@@ -24,6 +24,13 @@ def get_dialer(request: Request) -> OutboundDialer:
         mock = MockDialer()
         request.app.state.dialer = mock
         return mock
+    if os.environ.get("CALLSHIELD_DIALER") == "asterisk":
+        from callshield.telephony.asterisk.factory import get_asterisk_dialer
+
+        asterisk = get_asterisk_dialer(settings)  # None unless enabled + outbound_enabled
+        if asterisk is not None:
+            request.app.state.dialer = asterisk
+            return asterisk
     return DisabledDialer()
 
 

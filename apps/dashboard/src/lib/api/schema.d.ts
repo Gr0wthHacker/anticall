@@ -38,6 +38,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/acknowledgments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept Acknowledgment */
+        post: operations["accept_acknowledgment_v1_acknowledgments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/acknowledgments/current": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Current Acknowledgment
+         * @description The exact versioned text to display. Items are unchecked by default.
+         */
+        get: operations["current_acknowledgment_v1_acknowledgments_current_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/acknowledgments/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Acknowledgments */
+        get: operations["my_acknowledgments_v1_acknowledgments_me_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/audit-events": {
         parameters: {
             query?: never;
@@ -924,6 +978,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/filings/{filing_id}/resolve-unknown": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resolve Unknown Filing
+         * @description User records what they verified about an UNKNOWN filing. Never resends or invents.
+         */
+        post: operations["resolve_unknown_filing_v1_filings__filing_id__resolve_unknown_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/filings/{filing_id}/status-check": {
         parameters: {
             query?: never;
@@ -1555,6 +1629,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/system/doctor": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** System Doctor */
+        get: operations["system_doctor_v1_system_doctor_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/tenants": {
         parameters: {
             query?: never;
@@ -1612,10 +1703,61 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/webhooks/{provider}/{line_key}/outbound-attestation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Outbound Attestation Webhook */
+        post: operations["outbound_attestation_webhook_v1_webhooks__provider___line_key__outbound_attestation_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AcknowledgmentIn */
+        AcknowledgmentIn: {
+            /** Items */
+            items: {
+                [key: string]: boolean;
+            };
+            /** Text Sha256 */
+            text_sha256: string;
+        };
+        /** AcknowledgmentOut */
+        AcknowledgmentOut: {
+            /**
+             * Accepted At
+             * Format: date-time
+             */
+            accepted_at: string;
+            /** Acknowledgment Id */
+            acknowledgment_id: string;
+            /** Acknowledgment Version */
+            acknowledgment_version: string;
+            /**
+             * Created
+             * @default true
+             */
+            created: boolean;
+            /** Item Ids */
+            item_ids: string[];
+            /** Operator Id */
+            operator_id: string;
+            /** Text Sha256 */
+            text_sha256: string;
+            /** User Id */
+            user_id: string;
+        };
         /** AiCommentaryOut */
         AiCommentaryOut: {
             /** Label */
@@ -2219,6 +2361,36 @@ export interface components {
          * @enum {string}
          */
         DestinationProvenance: "INDEPENDENTLY_VERIFIED" | "USER_PROVIDED_UNVERIFIED" | "CALLER_ID_ONLY";
+        /** DoctorCheckOut */
+        DoctorCheckOut: {
+            /** Detail */
+            detail: string;
+            /** Fix */
+            fix: string;
+            /** Id */
+            id: string;
+            /** Status */
+            status: string;
+            /** Title */
+            title: string;
+        };
+        /** DoctorOut */
+        DoctorOut: {
+            /** Checks */
+            checks: components["schemas"]["DoctorCheckOut"][];
+            /** Counts */
+            counts: {
+                [key: string]: number;
+            };
+            /** Docs */
+            docs: {
+                [key: string]: string;
+            };
+            /** Gated Features */
+            gated_features: components["schemas"]["GatedFeatureOut"][];
+            /** Ok */
+            ok: boolean;
+        };
         /** DraftCreateRequest */
         DraftCreateRequest: {
             /** Destination */
@@ -2408,6 +2580,11 @@ export interface components {
             filing_id: string;
             /** Kind */
             kind: string;
+            /**
+             * Needs User Verification
+             * @default false
+             */
+            needs_user_verification: boolean;
             /** Next Step */
             next_step: string;
             /** Payload Digest */
@@ -2427,6 +2604,25 @@ export interface components {
             supplements_filing_id: string | null;
             /** Transport Response Ref */
             transport_response_ref: string | null;
+            /** Unknown Since */
+            unknown_since?: string | null;
+            /** User Resolution */
+            user_resolution?: string | null;
+        };
+        /** GatedFeatureOut */
+        GatedFeatureOut: {
+            /** Enabled */
+            enabled: boolean;
+            /** Env Var */
+            env_var: string;
+            /** Gates */
+            gates: string;
+            /** Key */
+            key: string;
+            /** Title */
+            title: string;
+            /** Warning */
+            warning: string;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -2724,6 +2920,17 @@ export interface components {
              */
             user_id: string;
         };
+        /** MyAcknowledgmentOut */
+        MyAcknowledgmentOut: {
+            /** Acknowledged */
+            acknowledged: boolean;
+            /** Current Text Sha256 */
+            current_text_sha256: string;
+            /** Current Version */
+            current_version: string;
+            /** History */
+            history: components["schemas"]["AcknowledgmentOut"][];
+        };
         /** NextStepOut */
         NextStepOut: {
             /**
@@ -2842,6 +3049,14 @@ export interface components {
          * @enum {string}
          */
         ResolutionState: "CREATED" | "DESTINATION_REVIEW" | "VERIFIED_DESTINATION" | "USER_APPROVED_CONTACT" | "IN_PROGRESS" | "REQUEST_DELIVERED" | "ACKNOWLEDGED" | "UNCONFIRMED" | "REFUSED" | "INTERRUPTED" | "MONITORING" | "NEXT_STEP_REVIEW" | "POSSIBLE_RECONTACT" | "ATTRIBUTION_REVIEW" | "REOPENED" | "NOT_RELATED" | "CLOSED";
+        /** ResolveUnknownInput */
+        ResolveUnknownInput: {
+            /** Confirmation Number */
+            confirmation_number?: string | null;
+            /** Note */
+            note?: string | null;
+            resolution: components["schemas"]["UnknownResolution"];
+        };
         /** ReviewIn */
         ReviewIn: {
             corrected_outcome?: components["schemas"]["ContactOutcome"] | null;
@@ -3038,6 +3253,11 @@ export interface components {
          * @enum {string}
          */
         TrustedContactKind: "TRUSTED" | "PERMITTED" | "KNOWN_UNWANTED" | "OVERRIDE";
+        /**
+         * UnknownResolution
+         * @enum {string}
+         */
+        UnknownResolution: "verified_submitted" | "verified_not_submitted" | "abandon";
         /** UnlinkRequest */
         UnlinkRequest: {
             /**
@@ -3391,6 +3611,81 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    accept_acknowledgment_v1_acknowledgments_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcknowledgmentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AcknowledgmentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    current_acknowledgment_v1_acknowledgments_current_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    my_acknowledgments_v1_acknowledgments_me_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyAcknowledgmentOut"];
                 };
             };
         };
@@ -5168,6 +5463,41 @@ export interface operations {
             };
         };
     };
+    resolve_unknown_filing_v1_filings__filing_id__resolve_unknown_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                filing_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResolveUnknownInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FilingOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     check_filing_status_v1_filings__filing_id__status_check_post: {
         parameters: {
             query?: never;
@@ -6529,6 +6859,26 @@ export interface operations {
             };
         };
     };
+    system_doctor_v1_system_doctor_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DoctorOut"];
+                };
+            };
+        };
+    };
     bootstrap_tenant_v1_tenants_post: {
         parameters: {
             query?: never;
@@ -6596,6 +6946,40 @@ export interface operations {
         };
     };
     provider_webhook_v1_webhooks__provider___line_key__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: string;
+                line_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    outbound_attestation_webhook_v1_webhooks__provider___line_key__outbound_attestation_post: {
         parameters: {
             query?: never;
             header?: never;
