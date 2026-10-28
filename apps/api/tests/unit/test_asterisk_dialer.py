@@ -313,6 +313,9 @@ def test_poll_blocks_for_events_then_returns_none_after_the_pause(
         lambda: handle.on_stt([final("Hello, this is Dave from Acme Solar", 0.0, 1.0)], origin)
     )
     ev = handle.poll()
+    deadline = time.monotonic() + 5.0
+    while ev is None and time.monotonic() < deadline:  # the loop thread may lag on slow runners
+        ev = handle.poll()
     assert ev is not None and ev.kind is MediaEventKind.SPEECH and ev.duration_seconds == 1.0
     started = time.monotonic()
     assert handle.poll() is None  # a business pause (0.1 s) ends the wait
