@@ -34,11 +34,13 @@ class Answers:
     timezone: str = "UTC"
     provider_profile: str = "generic_sip"
     provider_inputs: dict[str, str] = field(default_factory=dict)
-    ari_url: str = "http://127.0.0.1:8088/ari"
+    ari_url: str = "http://127.0.0.1:8088"
     ari_username: str = "callshield"
     ari_app: str = "callshield"
     stt_engine: str = "none"
     tts_engine: str = "none"
+    stt_model_dir: str = "./var/models/stt"
+    tts_model_dir: str = "./var/models/tts"
     features: dict[str, bool] = field(default_factory=dict)
     acknowledgment_items: list[str] = field(default_factory=list)
     callback_confirmation: str = ""
@@ -63,6 +65,8 @@ _SCALARS = (
     "ari_app",
     "stt_engine",
     "tts_engine",
+    "stt_model_dir",
+    "tts_model_dir",
     "callback_confirmation",
     "cors_origins",
     "backup_note",
@@ -131,21 +135,25 @@ def answers_to_env(ans: Answers, new_secret: Callable[[], str], trunk_name: str)
         "CALLSHIELD_JWT_SECRET": new_secret(),
         "CALLSHIELD_WEBHOOK_SECRET": new_secret(),
         "CALLSHIELD_CALLBACK_HMAC_SECRET": new_secret(),
-        "CALLSHIELD_ARI_PASSWORD": new_secret(),
+        "CALLSHIELD_ASTERISK_ARI_PASSWORD": new_secret(),
         "CALLSHIELD_CORS_ALLOW_ORIGINS": ans.cors_origins,
         "CALLSHIELD_INSTANCE_JURISDICTION": ans.jurisdiction,
         "CALLSHIELD_INSTANCE_TIMEZONE": ans.timezone,
         "CALLSHIELD_INSTANCE_PROVIDER_PROFILE": ans.provider_profile,
-        "CALLSHIELD_INSTANCE_TRUNK_NAME": trunk_name,
-        "CALLSHIELD_ARI_URL": ans.ari_url,
-        "CALLSHIELD_ARI_USERNAME": ans.ari_username,
-        "CALLSHIELD_ARI_APP": ans.ari_app,
+        "CALLSHIELD_ASTERISK_TRUNK_ENDPOINT": trunk_name,
+        "CALLSHIELD_ASTERISK_ARI_URL": ans.ari_url,
+        "CALLSHIELD_ASTERISK_ARI_USERNAME": ans.ari_username,
+        "CALLSHIELD_ASTERISK_APP_NAME": ans.ari_app,
         "CALLSHIELD_VOICE_STT_ENGINE": ans.stt_engine,
         "CALLSHIELD_VOICE_TTS_ENGINE": ans.tts_engine,
         "CALLSHIELD_ALLOW_BOOTSTRAP": "false",
     }
     if ans.backup_note:
         env["CALLSHIELD_INSTANCE_BACKUP_NOTE"] = ans.backup_note
+    if ans.stt_engine != "none":
+        env["CALLSHIELD_VOICE_STT_MODEL_DIR"] = ans.stt_model_dir
+    if ans.tts_engine != "none":
+        env["CALLSHIELD_VOICE_TTS_MODEL_DIR"] = ans.tts_model_dir
     for feature in RISKY_FEATURES:
         env[feature.env_var] = _flag(ans, feature.key)
     return env

@@ -78,7 +78,7 @@ def _write_all(
     write_private_file(out_dir / ".env", render_env(env))
     write_private_file(out_dir / pjsip_name, render_pjsip(profile, inputs))
     ari_conf = ARI_CONF_TEMPLATE.format(
-        user=ans.ari_username, password=env["CALLSHIELD_ARI_PASSWORD"]
+        user=ans.ari_username, password=env["CALLSHIELD_ASTERISK_ARI_PASSWORD"]
     )
     write_private_file(out_dir / "ari.callshield.conf", ari_conf)
     files = [".env", pjsip_name, "ari.callshield.conf"]

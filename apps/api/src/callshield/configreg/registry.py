@@ -11,17 +11,19 @@ from pydantic.fields import FieldInfo
 from pydantic_settings import BaseSettings
 
 from callshield.callback.config import CHANGEABLE_BY, CallbackSettings, Who
-from callshield.configreg.ext_settings import AriSettings, InstanceSettings, VoiceSettings
+from callshield.configreg.ext_settings import InstanceSettings
 from callshield.configreg.meta import META
 from callshield.core.config import Settings
 from callshield.llm.config import LLMSettings
+from callshield.telephony.asterisk.settings import AsteriskSettings
+from callshield.voice.config import VoiceSettings
 
 SETTINGS_CLASSES: tuple[type[BaseSettings], ...] = (
     Settings,
     CallbackSettings,
     LLMSettings,
     InstanceSettings,
-    AriSettings,
+    AsteriskSettings,
     VoiceSettings,
 )
 LOCKED_VALUES = {

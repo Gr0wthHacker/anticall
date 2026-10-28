@@ -14,7 +14,7 @@ GOOD = {
     "CALLSHIELD_JWT_SECRET": "j" * 40,
     "CALLSHIELD_WEBHOOK_SECRET": "w" * 40,
     "CALLSHIELD_CALLBACK_HMAC_SECRET": "h" * 40,
-    "CALLSHIELD_ARI_PASSWORD": "a" * 40,
+    "CALLSHIELD_ASTERISK_ARI_PASSWORD": "a" * 40,
     "CALLSHIELD_INSTANCE_JURISDICTION": "US-CA",
     "CALLSHIELD_INSTANCE_BACKUP_NOTE": "nightly copy to my NAS",
 }
@@ -71,7 +71,7 @@ def test_risky_flags_are_listed(tmp_path: Path) -> None:
 
 
 def test_ari_enabled_probes_and_reports_trunk(tmp_path: Path) -> None:
-    env = _env(tmp_path, {"CALLSHIELD_ARI_ENABLED": "true"})
+    env = _env(tmp_path, {"CALLSHIELD_ASTERISK_ENABLED": "true"})
     ok = _statuses(env, ari=AriProbe(True, "online", "ok"))
     assert ok["ari"] == "PASS" and ok["trunk"] == "PASS"
     down = _statuses(env, ari=AriProbe(False, None, "ConnectError"))
@@ -81,17 +81,17 @@ def test_ari_enabled_probes_and_reports_trunk(tmp_path: Path) -> None:
 
 
 def test_non_local_ari_url_warns_about_ports(tmp_path: Path) -> None:
-    env = _env(tmp_path, {"CALLSHIELD_ARI_URL": "http://203.0.113.5:8088/ari"})
+    env = _env(tmp_path, {"CALLSHIELD_ASTERISK_ARI_URL": "http://203.0.113.5:8088"})
     assert _statuses(env)["ports"] == "WARN"
 
 
 def test_voice_models_and_packages(tmp_path: Path) -> None:
     models = tmp_path / "models"
-    extra = {"CALLSHIELD_VOICE_STT_ENGINE": "vosk", "CALLSHIELD_VOICE_MODEL_DIR": str(models)}
+    extra = {"CALLSHIELD_VOICE_STT_ENGINE": "vosk", "CALLSHIELD_VOICE_STT_MODEL_DIR": str(models)}
     env = _env(tmp_path, extra)
     assert _statuses(env)["models"] == "FAIL"
-    (models / "vosk").mkdir(parents=True)
-    (models / "vosk" / "model.bin").write_text("x")
+    (models / "vosk-model-small-en-us-0.15").mkdir(parents=True)
+    (models / "vosk-model-small-en-us-0.15" / "model.bin").write_text("x")
     assert _statuses(env)["models"] == "PASS"
     assert _statuses(env, missing_modules=("vosk",))["voice_extras"] == "FAIL"
 

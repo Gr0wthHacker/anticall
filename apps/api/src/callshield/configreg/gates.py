@@ -21,7 +21,7 @@ class RiskyFeature:
 RISKY_FEATURES: tuple[RiskyFeature, ...] = (
     RiskyFeature(
         "ari",
-        "CALLSHIELD_ARI_ENABLED",
+        "CALLSHIELD_ASTERISK_ENABLED",
         "Asterisk ARI telephony control",
         "Connects CallShield to a live phone system that answers real calls. Misconfiguration "
         "can drop or mishandle calls and expose your SIP trunk to toll fraud.",

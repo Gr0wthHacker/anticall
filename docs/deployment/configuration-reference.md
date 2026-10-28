@@ -86,23 +86,55 @@ that gate. Callback ranges are hard ceilings: values above them are rejected at 
 | `CALLSHIELD_INSTANCE_TIMEZONE` | str | `UTC` | - | operator (.env) | - | IANA timezone for calling-hour checks. |
 | `CALLSHIELD_INSTANCE_PROVIDER_PROFILE` | str | `generic_sip` | - | operator (.env) | - | Provider profile id chosen in init. |
 | `CALLSHIELD_INSTANCE_PJSIP_PATH` | str | `""` | - | operator (.env) | - | Path of the generated pjsip snippet. |
-| `CALLSHIELD_INSTANCE_TRUNK_NAME` | str | `""` | - | operator (.env) | - | PJSIP trunk/endpoint name (used by doctor). |
 | `CALLSHIELD_INSTANCE_BACKUP_NOTE` | str | `""` | - | operator (.env) | - | Free text: where your backups go (checked by doctor). |
 
-## Asterisk ARI
+## Asterisk telephony (ARI)
 
 | Variable | Type | Default | Range | Who may change | Related gate | Description |
 |---|---|---|---|---|---|---|
-| `CALLSHIELD_ARI_ENABLED` | bool | `false` | true/false | operator (.env) | G5 | Connect to Asterisk ARI. |
-| `CALLSHIELD_ARI_URL` | str | `http://127.0.0.1:8088/ari` | - | operator (.env) | - | ARI base URL. Keep it on localhost. |
-| `CALLSHIELD_ARI_USERNAME` | str | `callshield` | - | operator (.env) | - | ARI user. |
-| `CALLSHIELD_ARI_PASSWORD` | secret | `(empty)` | - | operator (.env) | - | ARI password; must equal ari.conf. |
-| `CALLSHIELD_ARI_APP` | str | `callshield` | - | operator (.env) | - | Stasis application name. |
+| `CALLSHIELD_ASTERISK_ENABLED` | bool | `false` | true/false | operator (.env) | G5 | Run the Asterisk ARI telephony runner. |
+| `CALLSHIELD_ASTERISK_ARI_URL` | str | `http://127.0.0.1:8088` | - | operator (.env) | - | ARI base URL, no credentials, no /ari suffix. Keep it on localhost. Legacy CALLSHIELD_ARI_URL is accepted as a fallback. |
+| `CALLSHIELD_ASTERISK_ARI_USERNAME` | str | `callshield` | - | operator (.env) | - | ARI user (legacy fallback: CALLSHIELD_ARI_USERNAME). |
+| `CALLSHIELD_ASTERISK_ARI_PASSWORD` | secret | `(empty)` | - | operator (.env) | - | ARI password; must equal ari.conf (legacy fallback: CALLSHIELD_ARI_PASSWORD). |
+| `CALLSHIELD_ASTERISK_APP_NAME` | str | `callshield` | - | operator (.env) | - | Inbound Stasis application name (legacy fallback: CALLSHIELD_ARI_APP). |
+| `CALLSHIELD_ASTERISK_OUTBOUND_APP_NAME` | str | `callshield-out` | - | operator (.env) | - | Stasis application for callback legs. |
+| `CALLSHIELD_ASTERISK_EXTERNAL_MEDIA_HOST` | str | `127.0.0.1` | - | operator (.env) | - | Host Asterisk sends RTP to. |
+| `CALLSHIELD_ASTERISK_EXTERNAL_MEDIA_BIND` | str | `127.0.0.1` | - | operator (.env) | - | Local address CallShield binds RTP on. |
+| `CALLSHIELD_ASTERISK_EXTERNAL_MEDIA_PORT` | int | `4000` | 1024-65000 | operator (.env) | - | First RTP port CallShield uses. |
+| `CALLSHIELD_ASTERISK_EXTERNAL_MEDIA_PORT_COUNT` | int | `100` | 1-2000 | operator (.env) | - | Number of RTP ports in the range. |
+| `CALLSHIELD_ASTERISK_CODEC` | Literal['ulaw', 'slin16'] | `ulaw` | - | operator (.env) | - | Media codec: ulaw (8 kHz) or slin16. |
+| `CALLSHIELD_ASTERISK_TRUNK_ENDPOINT` | str | `trunk` | - | operator (.env) | - | PJSIP endpoint name of the trunk (used by dial and doctor). |
+| `CALLSHIELD_ASTERISK_DIAL_FORMAT` | str | `PJSIP/{number}@{trunk}` | - | operator (.env) | - | Outbound dial string template; must contain {number}. |
+| `CALLSHIELD_ASTERISK_DIAL_STRIP_PLUS` | bool | `false` | true/false | operator (.env) | - | Strip the leading + when dialing. |
+| `CALLSHIELD_ASTERISK_USER_DIAL_FORMAT` | str | `PJSIP/{number}@{trunk}` | - | operator (.env) | - | Dial string template for ringing the user. |
+| `CALLSHIELD_ASTERISK_VOICEMAIL_CONTEXT` | str | `callshield-route` | - | operator (.env) | - | Dialplan context for the voicemail hand-off. |
+| `CALLSHIELD_ASTERISK_VOICEMAIL_EXTENSION` | str | `voicemail` | - | operator (.env) | - | Dialplan extension for the voicemail hand-off. |
+| `CALLSHIELD_ASTERISK_FALLBACK_CONTEXT` | str | `callshield-route` | - | operator (.env) | - | Dialplan context for ring-the-user fallback. |
+| `CALLSHIELD_ASTERISK_FALLBACK_EXTENSION` | str | `ring-user` | - | operator (.env) | - | Dialplan extension for ring-the-user fallback. |
+| `CALLSHIELD_ASTERISK_RING_TIMEOUT_SECONDS` | int | `45` | 5-120 | operator (.env) | - | Seconds to ring before giving up. |
+| `CALLSHIELD_ASTERISK_MAX_CALL_SECONDS_CAP` | int | `120` | 1-120 | operator (.env) | - | Hard cap on a screened or callback call. |
+| `CALLSHIELD_ASTERISK_SCREENING_NO_SPEECH_SECONDS` | float | `8.0` | 1.0-30.0 | operator (.env) | - | Silence before screening gives up. |
+| `CALLSHIELD_ASTERISK_RECONNECT_MIN_SECONDS` | float | `0.5` | 0- | operator (.env) | - | Minimum ARI reconnect backoff. |
+| `CALLSHIELD_ASTERISK_RECONNECT_MAX_SECONDS` | float | `30.0` | 0- | operator (.env) | - | Maximum ARI reconnect backoff. |
+| `CALLSHIELD_ASTERISK_RECORDING_DIR` | pathlib.Path \| None | `(unset)` | - | operator (.env) | - | Callback recordings (post-disclosure only); unset = none. |
+| `CALLSHIELD_ASTERISK_HEALTH_HOST` | str | `127.0.0.1` | - | operator (.env) | - | Runner health endpoint bind address. |
+| `CALLSHIELD_ASTERISK_HEALTH_PORT` | int | `8089` | 0-65535 | operator (.env) | - | Runner health endpoint port (0 disables). |
 
 ## Voice engines
 
 | Variable | Type | Default | Range | Who may change | Related gate | Description |
 |---|---|---|---|---|---|---|
-| `CALLSHIELD_VOICE_STT_ENGINE` | str | `none` | - | operator (.env) | - | Speech-to-text engine: none, vosk, faster-whisper. |
-| `CALLSHIELD_VOICE_TTS_ENGINE` | str | `none` | - | operator (.env) | - | Text-to-speech engine: none, piper. |
-| `CALLSHIELD_VOICE_MODEL_DIR` | str | `./var/models` | - | operator (.env) | - | Directory holding downloaded voice models. |
+| `CALLSHIELD_VOICE_STT_ENGINE` | Literal['faster-whisper', 'vosk', 'none'] | `none` | - | operator (.env) | - | Speech-to-text engine: none, vosk, faster-whisper. |
+| `CALLSHIELD_VOICE_STT_MODEL` | str \| None | `(unset)` | - | operator (.env) | - | Whisper size/name, or the vosk model folder name. |
+| `CALLSHIELD_VOICE_STT_MODEL_DIR` | str \| None | `(unset)` | - | operator (.env) | - | Folder holding STT models (required for vosk). |
+| `CALLSHIELD_VOICE_STT_DEVICE` | Literal['cpu', 'cuda'] | `cpu` | - | operator (.env) | - | cpu or cuda. |
+| `CALLSHIELD_VOICE_STT_COMPUTE_TYPE` | str \| None | `(unset)` | - | operator (.env) | - | Whisper compute type; default int8 on cpu. |
+| `CALLSHIELD_VOICE_STT_LANGUAGE` | str | `en` | - | operator (.env) | - | Spoken language code. |
+| `CALLSHIELD_VOICE_TTS_ENGINE` | Literal['piper', 'none'] | `none` | - | operator (.env) | - | Text-to-speech engine: none, piper. |
+| `CALLSHIELD_VOICE_TTS_VOICE` | str | `en_US-lessac-medium` | - | operator (.env) | - | Piper voice name. |
+| `CALLSHIELD_VOICE_TTS_MODEL_DIR` | str \| None | `(unset)` | - | operator (.env) | - | Folder with <voice>.onnx and <voice>.onnx.json. |
+| `CALLSHIELD_VOICE_TTS_MODEL_PATH` | str \| None | `(unset)` | - | operator (.env) | - | Explicit .onnx path (overrides dir and voice). |
+| `CALLSHIELD_VOICE_VAD` | Literal['energy', 'silero'] | `energy` | - | operator (.env) | - | Voice activity detector: energy or silero. |
+| `CALLSHIELD_VOICE_VAD_MODEL_PATH` | str \| None | `(unset)` | - | operator (.env) | - | silero_vad.onnx path (required for silero). |
+| `CALLSHIELD_VOICE_VAD_ENERGY_THRESHOLD` | float | `400.0` | - | operator (.env) | - | RMS threshold for the energy VAD. |
+| `CALLSHIELD_VOICE_SAMPLE_RATE` | Literal[8000, 16000] | `16000` | - | operator (.env) | - | Engine sample rate in Hz: 8000 or 16000. |

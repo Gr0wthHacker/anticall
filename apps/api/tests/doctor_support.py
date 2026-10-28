@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from callshield.configreg.ext_settings import AriSettings
 from callshield.doctor.model import AriProbe, DbStatus, DoctorDeps
+from callshield.telephony.asterisk.settings import AsteriskSettings
 
 
 def fake_deps(
@@ -18,7 +18,7 @@ def fake_deps(
     def check_db(_url: str) -> DbStatus:
         return db_status
 
-    def probe_ari(_ari: AriSettings, _trunk: str) -> AriProbe:
+    def probe_ari(_ari: AsteriskSettings, _trunk: str) -> AriProbe:
         return ari_probe
 
     def module_available(name: str) -> bool:

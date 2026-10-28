@@ -34,7 +34,7 @@ def is_weak_secret(value: str) -> bool:
 
 def risky_enabled(cfg: LoadedConfig) -> list[str]:
     flags = {
-        "CALLSHIELD_ARI_ENABLED": cfg.ari.enabled,
+        "CALLSHIELD_ASTERISK_ENABLED": cfg.asterisk.enabled,
         "CALLSHIELD_LIVE_STT_ENABLED": cfg.settings.live_stt_enabled,
         "CALLSHIELD_OUTBOUND_ENABLED": cfg.settings.outbound_enabled,
         "CALLSHIELD_AI_OUTBOUND_ENABLED": cfg.settings.ai_outbound_enabled,
@@ -72,7 +72,7 @@ def check_dependencies(cfg: LoadedConfig, deps: DoctorDeps) -> CheckResult:
             "psycopg missing for Postgres",
             "pip install -e 'apps/api[postgres]'",
         )
-    if cfg.ari.enabled and not deps.module_available("aiohttp"):
+    if cfg.asterisk.enabled and not deps.module_available("aiohttp"):
         return _r(
             "deps",
             "Core dependencies",
@@ -140,8 +140,8 @@ def check_secrets(cfg: LoadedConfig, deps: DoctorDeps) -> CheckResult:
     }
     if cfg.callback.callback_enabled:
         named["CALLSHIELD_CALLBACK_HMAC_SECRET"] = cfg.callback.hmac_secret.get_secret_value()
-    if cfg.ari.enabled:
-        named["CALLSHIELD_ARI_PASSWORD"] = cfg.ari.password.get_secret_value()
+    if cfg.asterisk.enabled:
+        named["CALLSHIELD_ASTERISK_ARI_PASSWORD"] = cfg.asterisk.ari_password.get_secret_value()
     bad = sorted(k for k, v in named.items() if is_weak_secret(v))
     if not bad:
         return _r("secrets", "Secrets set and non-default", "PASS", "all required secrets set")
@@ -156,9 +156,9 @@ def check_secrets(cfg: LoadedConfig, deps: DoctorDeps) -> CheckResult:
 
 
 def check_ari(cfg: LoadedConfig, deps: DoctorDeps) -> CheckResult:
-    if not cfg.ari.enabled:
+    if not cfg.asterisk.enabled:
         return _r("ari", "Asterisk ARI reachable", "SKIP", "ARI disabled")
-    probe = deps.probe_ari(cfg.ari, cfg.instance.trunk_name)
+    probe = deps.probe_ari(cfg.asterisk, cfg.asterisk.trunk_endpoint)
     if probe.reachable:
         return _r("ari", "Asterisk ARI reachable", "PASS", probe.detail)
     return _r(
@@ -166,15 +166,15 @@ def check_ari(cfg: LoadedConfig, deps: DoctorDeps) -> CheckResult:
         "Asterisk ARI reachable",
         "FAIL",
         probe.detail,
-        "Start Asterisk; match CALLSHIELD_ARI_URL/USERNAME/PASSWORD to ari.conf.",
+        "Start Asterisk; match CALLSHIELD_ASTERISK_ARI_URL/_USERNAME/_PASSWORD to ari.conf.",
     )
 
 
 def check_trunk(cfg: LoadedConfig, deps: DoctorDeps) -> CheckResult:
     title = "Trunk status (best effort)"
-    if not cfg.ari.enabled:
+    if not cfg.asterisk.enabled:
         return _r("trunk", title, "SKIP", "ARI disabled")
-    probe = deps.probe_ari(cfg.ari, cfg.instance.trunk_name)
+    probe = deps.probe_ari(cfg.asterisk, cfg.asterisk.trunk_endpoint)
     if not probe.reachable:
         return _r("trunk", title, "SKIP", "ARI not reachable")
     if probe.trunk_state is None:
@@ -183,7 +183,7 @@ def check_trunk(cfg: LoadedConfig, deps: DoctorDeps) -> CheckResult:
             title,
             "WARN",
             "state unknown",
-            "Set CALLSHIELD_INSTANCE_TRUNK_NAME and check `pjsip show registrations`.",
+            "Set CALLSHIELD_ASTERISK_TRUNK_ENDPOINT; check `pjsip show registrations`.",
         )
     if probe.trunk_state.lower() in ("online", "reachable"):
         return _r("trunk", title, "PASS", probe.trunk_state)
@@ -197,20 +197,35 @@ def check_trunk(cfg: LoadedConfig, deps: DoctorDeps) -> CheckResult:
 
 
 def check_models(cfg: LoadedConfig, deps: DoctorDeps) -> CheckResult:
-    engines = [e for e in (cfg.voice.stt_engine, cfg.voice.tts_engine) if e != "none"]
-    if not engines:
+    voice = cfg.voice
+    if voice.stt_engine == "none" and voice.tts_engine == "none":
         return _r("models", "Voice models on disk", "SKIP", "no voice engine selected")
-    root = Path(cfg.voice.model_dir)
-    missing = [e for e in engines if not _has_files(root / e)]
+    missing: list[str] = []
+    if voice.stt_engine != "none":
+        stt = voice.stt_model_path()
+        if stt is None:
+            return _r(
+                "models",
+                "Voice models on disk",
+                "WARN",
+                f"{voice.stt_engine}: CALLSHIELD_VOICE_STT_MODEL_DIR unset, cannot check",
+                "Set CALLSHIELD_VOICE_STT_MODEL_DIR; run: callshield voice models",
+            )
+        if not _has_files(stt):
+            missing.append(f"stt {stt}")
+    if voice.tts_engine != "none":
+        tts = voice.piper_model_path()
+        if tts is None or not (tts.is_file() and Path(f"{tts}.json").is_file()):
+            missing.append(f"tts {tts}(.json)")
     if missing:
         return _r(
             "models",
             "Voice models on disk",
             "FAIL",
-            "no files for: " + ", ".join(missing),
+            "not found: " + ", ".join(missing),
             "Run: callshield voice models  (manual download steps)",
         )
-    return _r("models", "Voice models on disk", "PASS", ", ".join(engines))
+    return _r("models", "Voice models on disk", "PASS", voice.stt_engine + "/" + voice.tts_engine)
 
 
 def _has_files(path: Path) -> bool:
@@ -219,7 +234,7 @@ def _has_files(path: Path) -> bool:
 
 def check_ports(cfg: LoadedConfig, deps: DoctorDeps) -> CheckResult:
     problems = []
-    host = urlparse(cfg.ari.url).hostname or ""
+    host = urlparse(cfg.asterisk.ari_url).hostname or ""
     if host and host not in LOOPBACK:
         problems.append(f"ARI URL host '{host}' is not localhost")
     pjsip = cfg.instance.pjsip_path
@@ -337,7 +352,7 @@ def check_profile(cfg: LoadedConfig, deps: DoctorDeps) -> CheckResult:
             "unknown profile id",
             "Use `callshield init` to pick one of the shipped profiles.",
         )
-    if profile.verified or profile.local_only or not cfg.ari.enabled:
+    if profile.verified or profile.local_only or not cfg.asterisk.enabled:
         return _r("profile", "Provider profile", "PASS", profile.id)
     return _r(
         "profile",

@@ -26,8 +26,8 @@ Output: `pjsip.callshield.conf` (contains your SIP password; mode 0600), `ari.ca
 ## 2. Install the configs into Asterisk
 
 - Include `pjsip.callshield.conf` from your `pjsip.conf` (or paste it in). If your `pjsip.conf` already has a transport, point `transport_name` at it instead of generating a second one.
-- Put the ARI user from `ari.callshield.conf` into `ari.conf`. Its password must equal `CALLSHIELD_ARI_PASSWORD`.
-- Route the trunk's context (`from-trunk` by default) to the Stasis application named in `CALLSHIELD_ARI_APP`. See [`integrations/asterisk/extensions.conf`](../../integrations/asterisk/extensions.conf) for a harness example. If the application is down your dialplan must fall back to ringing your phone; test that.
+- Put the ARI user from `ari.callshield.conf` into `ari.conf`. Its password must equal `CALLSHIELD_ASTERISK_ARI_PASSWORD`.
+- Route the trunk's context (`from-trunk` by default) to the Stasis application named in `CALLSHIELD_ASTERISK_APP_NAME`. See [`integrations/asterisk/extensions.conf`](../../integrations/asterisk/extensions.conf) for a harness example. If the application is down your dialplan must fall back to ringing your phone; test that.
 
 ## 3. NAT and RTP
 
@@ -40,7 +40,7 @@ Most home and cloud setups sit behind NAT. Symptoms: calls connect but audio is 
 
 ## 4. Keep ARI private
 
-ARI (default `http://127.0.0.1:8088/ari`) can originate calls and control channels.
+ARI (default `http://127.0.0.1:8088`, set by `CALLSHIELD_ASTERISK_ARI_URL`) can originate calls and control channels.
 
 - Bind it to `127.0.0.1`. Never expose port 8088. `callshield doctor` warns if the URL host is not localhost or if the pjsip transport binds `0.0.0.0`.
 - Use the generated random password. Rotate it by editing both `ari.conf` and `.env`.

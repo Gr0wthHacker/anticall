@@ -23,3 +23,7 @@ Placeholders `${NAME}` are rendered from the container environment by
 ```bash
 docker compose -f infra/docker/docker-compose.yml --profile asterisk up --build
 ```
+
+## Environment variables
+
+CallShield reads `CALLSHIELD_ASTERISK_*` (`ARI_URL`, `ARI_USERNAME`, `ARI_PASSWORD`, `APP_NAME`, `TRUNK_ENDPOINT`, ...) and `CALLSHIELD_VOICE_*`. The older `CALLSHIELD_ARI_URL/USERNAME/PASSWORD/APP` names are accepted only as fallbacks. Full list: [`docs/deployment/configuration-reference.md`](../../docs/deployment/configuration-reference.md).

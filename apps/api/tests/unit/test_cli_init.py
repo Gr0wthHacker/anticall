@@ -57,7 +57,7 @@ def test_default_wizard_turns_everything_off(
     cfg = load_config(tmp_path / ".env")
     assert cfg.settings.outbound_enabled is False
     assert cfg.callback.callback_enabled is False
-    assert cfg.ari.enabled is False
+    assert cfg.asterisk.enabled is False
     assert cfg.instance.jurisdiction == "US-CA"
     report = (tmp_path / "SETUP_REPORT.md").read_text(encoding="utf-8")
     assert "| ON |" not in report
@@ -75,7 +75,7 @@ def test_secrets_are_generated_distinct_and_never_echoed(
         cfg.settings.jwt_secret.get_secret_value(),
         cfg.settings.webhook_secret.get_secret_value(),
         cfg.callback.hmac_secret.get_secret_value(),
-        cfg.ari.password.get_secret_value(),
+        cfg.asterisk.ari_password.get_secret_value(),
     }
     assert len(secrets_) == 4
     shown = capsys.readouterr()
@@ -84,7 +84,7 @@ def test_secrets_are_generated_distinct_and_never_echoed(
         assert secret not in shown.out + shown.err + report
     assert SIP_PASSWORD in (tmp_path / "pjsip.callshield.conf").read_text(encoding="utf-8")
     ari_conf = (tmp_path / "ari.callshield.conf").read_text(encoding="utf-8")
-    assert cfg.ari.password.get_secret_value() in ari_conf
+    assert cfg.asterisk.ari_password.get_secret_value() in ari_conf
 
 
 def test_callback_needs_exact_sentence(tmp_path: Path) -> None:
@@ -141,7 +141,7 @@ def test_non_interactive_writes_files_with_chosen_profile(tmp_path: Path) -> Non
     assert _non_interactive(tmp_path, _answers(tmp_path)) == 0
     conf = (tmp_path / "pjsip.callshield.conf").read_text(encoding="utf-8")
     assert "match=192.0.2.0/24" in conf and "profile=telnyx" in conf
-    assert load_config(tmp_path / ".env").instance.trunk_name == "tnx"
+    assert load_config(tmp_path / ".env").asterisk.trunk_endpoint == "tnx"
 
 
 def test_non_interactive_refuses_callback_without_confirmation(tmp_path: Path) -> None:

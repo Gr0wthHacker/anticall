@@ -6,10 +6,12 @@ from pathlib import Path
 from typing import Any
 
 from callshield.callback.config import CallbackSettings
-from callshield.configreg.ext_settings import AriSettings, InstanceSettings, VoiceSettings
+from callshield.configreg.ext_settings import InstanceSettings
 from callshield.core.config import Settings
 from callshield.doctor.model import LoadedConfig
 from callshield.llm.config import LLMSettings
+from callshield.telephony.asterisk.settings import AsteriskSettings
+from callshield.voice.config import VoiceSettings
 
 
 def load_config(env_file: Path | None = None) -> LoadedConfig:
@@ -20,7 +22,7 @@ def load_config(env_file: Path | None = None) -> LoadedConfig:
         callback=CallbackSettings(**kwargs),
         llm=LLMSettings(**kwargs),
         instance=InstanceSettings(**kwargs),
-        ari=AriSettings(**kwargs),
+        asterisk=AsteriskSettings(**kwargs),
         voice=VoiceSettings(**kwargs),
         env_file=env_file if env_file is not None else _default_env(),
     )
@@ -38,7 +40,7 @@ def config_from_app_settings(settings: Settings) -> LoadedConfig:
         callback=CallbackSettings(),
         llm=LLMSettings(),
         instance=InstanceSettings(),
-        ari=AriSettings(),
+        asterisk=AsteriskSettings(),
         voice=VoiceSettings(),
         env_file=_default_env(),
     )

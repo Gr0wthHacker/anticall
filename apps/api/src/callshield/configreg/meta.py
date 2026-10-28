@@ -86,14 +86,59 @@ META: dict[str, SettingMeta] = {
     "CALLSHIELD_INSTANCE_TIMEZONE": _m("IANA timezone for calling-hour checks."),
     "CALLSHIELD_INSTANCE_PROVIDER_PROFILE": _m("Provider profile id chosen in init."),
     "CALLSHIELD_INSTANCE_PJSIP_PATH": _m("Path of the generated pjsip snippet."),
-    "CALLSHIELD_INSTANCE_TRUNK_NAME": _m("PJSIP trunk/endpoint name (used by doctor)."),
     "CALLSHIELD_INSTANCE_BACKUP_NOTE": _m("Free text: where your backups go (checked by doctor)."),
-    "CALLSHIELD_ARI_ENABLED": _m("Connect to Asterisk ARI.", "G5"),
-    "CALLSHIELD_ARI_URL": _m("ARI base URL. Keep it on localhost."),
-    "CALLSHIELD_ARI_USERNAME": _m("ARI user."),
-    "CALLSHIELD_ARI_PASSWORD": _m("ARI password; must equal ari.conf."),
-    "CALLSHIELD_ARI_APP": _m("Stasis application name."),
+    # --- asterisk (telephony.asterisk.settings.AsteriskSettings) ---
+    "CALLSHIELD_ASTERISK_ENABLED": _m("Run the Asterisk ARI telephony runner.", "G5"),
+    "CALLSHIELD_ASTERISK_ARI_URL": _m(
+        "ARI base URL, no credentials, no /ari suffix. Keep it on localhost. "
+        "Legacy CALLSHIELD_ARI_URL is accepted as a fallback."
+    ),
+    "CALLSHIELD_ASTERISK_ARI_USERNAME": _m("ARI user (legacy fallback: CALLSHIELD_ARI_USERNAME)."),
+    "CALLSHIELD_ASTERISK_ARI_PASSWORD": _m(
+        "ARI password; must equal ari.conf (legacy fallback: CALLSHIELD_ARI_PASSWORD)."
+    ),
+    "CALLSHIELD_ASTERISK_APP_NAME": _m(
+        "Inbound Stasis application name (legacy fallback: CALLSHIELD_ARI_APP)."
+    ),
+    "CALLSHIELD_ASTERISK_OUTBOUND_APP_NAME": _m("Stasis application for callback legs."),
+    "CALLSHIELD_ASTERISK_EXTERNAL_MEDIA_HOST": _m("Host Asterisk sends RTP to."),
+    "CALLSHIELD_ASTERISK_EXTERNAL_MEDIA_BIND": _m("Local address CallShield binds RTP on."),
+    "CALLSHIELD_ASTERISK_EXTERNAL_MEDIA_PORT": _m("First RTP port CallShield uses."),
+    "CALLSHIELD_ASTERISK_EXTERNAL_MEDIA_PORT_COUNT": _m("Number of RTP ports in the range."),
+    "CALLSHIELD_ASTERISK_CODEC": _m("Media codec: ulaw (8 kHz) or slin16."),
+    "CALLSHIELD_ASTERISK_TRUNK_ENDPOINT": _m(
+        "PJSIP endpoint name of the trunk (used by dial and doctor)."
+    ),
+    "CALLSHIELD_ASTERISK_DIAL_FORMAT": _m("Outbound dial string template; must contain {number}."),
+    "CALLSHIELD_ASTERISK_DIAL_STRIP_PLUS": _m("Strip the leading + when dialing."),
+    "CALLSHIELD_ASTERISK_USER_DIAL_FORMAT": _m("Dial string template for ringing the user."),
+    "CALLSHIELD_ASTERISK_VOICEMAIL_CONTEXT": _m("Dialplan context for the voicemail hand-off."),
+    "CALLSHIELD_ASTERISK_VOICEMAIL_EXTENSION": _m("Dialplan extension for the voicemail hand-off."),
+    "CALLSHIELD_ASTERISK_FALLBACK_CONTEXT": _m("Dialplan context for ring-the-user fallback."),
+    "CALLSHIELD_ASTERISK_FALLBACK_EXTENSION": _m("Dialplan extension for ring-the-user fallback."),
+    "CALLSHIELD_ASTERISK_RING_TIMEOUT_SECONDS": _m("Seconds to ring before giving up."),
+    "CALLSHIELD_ASTERISK_MAX_CALL_SECONDS_CAP": _m("Hard cap on a screened or callback call."),
+    "CALLSHIELD_ASTERISK_SCREENING_NO_SPEECH_SECONDS": _m("Silence before screening gives up."),
+    "CALLSHIELD_ASTERISK_RECONNECT_MIN_SECONDS": _m("Minimum ARI reconnect backoff."),
+    "CALLSHIELD_ASTERISK_RECONNECT_MAX_SECONDS": _m("Maximum ARI reconnect backoff."),
+    "CALLSHIELD_ASTERISK_RECORDING_DIR": _m(
+        "Callback recordings (post-disclosure only); unset = none."
+    ),
+    "CALLSHIELD_ASTERISK_HEALTH_HOST": _m("Runner health endpoint bind address."),
+    "CALLSHIELD_ASTERISK_HEALTH_PORT": _m("Runner health endpoint port (0 disables)."),
+    # --- voice (voice.config.VoiceSettings) ---
     "CALLSHIELD_VOICE_STT_ENGINE": _m("Speech-to-text engine: none, vosk, faster-whisper."),
+    "CALLSHIELD_VOICE_STT_MODEL": _m("Whisper size/name, or the vosk model folder name."),
+    "CALLSHIELD_VOICE_STT_MODEL_DIR": _m("Folder holding STT models (required for vosk)."),
+    "CALLSHIELD_VOICE_STT_DEVICE": _m("cpu or cuda."),
+    "CALLSHIELD_VOICE_STT_COMPUTE_TYPE": _m("Whisper compute type; default int8 on cpu."),
+    "CALLSHIELD_VOICE_STT_LANGUAGE": _m("Spoken language code."),
     "CALLSHIELD_VOICE_TTS_ENGINE": _m("Text-to-speech engine: none, piper."),
-    "CALLSHIELD_VOICE_MODEL_DIR": _m("Directory holding downloaded voice models."),
+    "CALLSHIELD_VOICE_TTS_VOICE": _m("Piper voice name."),
+    "CALLSHIELD_VOICE_TTS_MODEL_DIR": _m("Folder with <voice>.onnx and <voice>.onnx.json."),
+    "CALLSHIELD_VOICE_TTS_MODEL_PATH": _m("Explicit .onnx path (overrides dir and voice)."),
+    "CALLSHIELD_VOICE_VAD": _m("Voice activity detector: energy or silero."),
+    "CALLSHIELD_VOICE_VAD_MODEL_PATH": _m("silero_vad.onnx path (required for silero)."),
+    "CALLSHIELD_VOICE_VAD_ENERGY_THRESHOLD": _m("RMS threshold for the energy VAD."),
+    "CALLSHIELD_VOICE_SAMPLE_RATE": _m("Engine sample rate in Hz: 8000 or 16000."),
 }

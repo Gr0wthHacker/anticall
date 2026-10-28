@@ -13,7 +13,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Literal
 
-from pydantic import model_validator
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 DEFAULT_WHISPER_MODEL = "small.en"
@@ -23,7 +23,9 @@ _HELP = "Install with pip install 'callshield[voice]'; models: docs/deployment/v
 
 
 class VoiceSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="CALLSHIELD_VOICE_", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_prefix="CALLSHIELD_VOICE_", env_file=".env", extra="ignore"
+    )
 
     stt_engine: Literal["faster-whisper", "vosk", "none"] = "none"
     stt_model: str | None = None  # whisper size/name, or the vosk model directory name
@@ -39,6 +41,14 @@ class VoiceSettings(BaseSettings):
     vad_model_path: str | None = None
     vad_energy_threshold: float = 400.0
     sample_rate: Literal[8000, 16000] = 16000
+
+    @field_validator("sample_rate", mode="before")
+    @classmethod
+    def _sample_rate_from_env(cls, value: object) -> object:
+        """Env values are strings; Literal[8000, 16000] would otherwise reject "16000"."""
+        if isinstance(value, str) and value.strip().isdigit():
+            return int(value)
+        return value
 
     @model_validator(mode="after")
     def _engines_have_what_they_need(self) -> VoiceSettings:

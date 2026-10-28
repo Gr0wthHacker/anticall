@@ -8,9 +8,9 @@ from pathlib import Path
 import httpx
 from sqlalchemy import Engine, text
 
-from callshield.configreg.ext_settings import AriSettings
 from callshield.db.session import make_engine
 from callshield.doctor.model import AriProbe, DbStatus, DoctorDeps
+from callshield.telephony.asterisk.settings import AsteriskSettings
 
 
 def find_alembic_dir() -> Path | None:
@@ -71,10 +71,10 @@ def _current_revision(conn: object) -> str | None:
     return MigrationContext.configure(conn).get_current_revision()  # type: ignore[arg-type]
 
 
-def probe_ari(ari: AriSettings, trunk_name: str) -> AriProbe:
+def probe_ari(ari: AsteriskSettings, trunk_name: str) -> AriProbe:
     """Ask ARI for its info and (best effort) the trunk endpoint state. Short timeout."""
-    auth = (ari.username, ari.password.get_secret_value())
-    base = ari.url.rstrip("/")
+    auth = (ari.ari_username, ari.ari_password.get_secret_value())
+    base = f"{ari.ari_url}/ari"
     try:
         with httpx.Client(timeout=3.0, auth=auth) as client:
             info = client.get(f"{base}/asterisk/info")

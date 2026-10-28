@@ -11,8 +11,8 @@ import httpx
 
 from callshield.cli.context import CliContext
 from callshield.cli.out import err, out
-from callshield.configreg.ext_settings import VoiceSettings
 from callshield.configreg.voice_catalog import CATALOG, VoiceModel, catalog_for
+from callshield.voice.config import VoiceSettings
 
 
 def register(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
@@ -22,11 +22,18 @@ def register(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     models.add_argument("--download", metavar="ENGINE", help="download (needs a pinned sha256)")
 
 
-def print_instructions(entry: VoiceModel, model_dir: str) -> None:
+def model_destination(entry: VoiceModel, settings: VoiceSettings) -> Path:
+    """Where VoiceSettings expects this model (STT: <stt_model_dir>/<model>; TTS: tts dir)."""
+    if entry.kind == "tts":
+        return Path(settings.tts_model_dir or "./var/models/tts")
+    return Path(settings.stt_model_dir or "./var/models/stt") / entry.model.split()[0]
+
+
+def print_instructions(entry: VoiceModel, settings: VoiceSettings) -> None:
     out(f"- {entry.engine} ({entry.kind}): {entry.model}")
     out(f"    install:  pip install -e 'apps/api[{entry.pip_extra}]'")
     out(f"    get it:   {entry.page}")
-    out(f"    place in: {Path(model_dir) / entry.engine}")
+    out(f"    place in: {model_destination(entry, settings)}")
     out(f"    {entry.note}")
 
 
@@ -64,15 +71,16 @@ def download_model(
 
 
 def run(args: argparse.Namespace, ctx: CliContext, catalog: Sequence[VoiceModel] = CATALOG) -> int:
-    model_dir = VoiceSettings().model_dir
+    settings = VoiceSettings()
     if args.download:
         entry = catalog_for(args.download)
         if entry is None:
             err("unknown engine; known: " + ", ".join(e.engine for e in catalog))
             return 2
-        return download_model(entry, Path(model_dir) / entry.engine, ctx)
+        return download_model(entry, model_destination(entry, settings), ctx)
     out("Recommended local voice engines (all UNVERIFIED suggestions; models are not bundled):")
     for entry in catalog:
-        print_instructions(entry, model_dir)
-    out("\nSet CALLSHIELD_VOICE_STT_ENGINE / _TTS_ENGINE; `callshield doctor` checks them.")
+        print_instructions(entry, settings)
+    out("Set CALLSHIELD_VOICE_STT_ENGINE / _TTS_ENGINE and the *_MODEL_DIR variables.")
+    out("`callshield doctor` checks them.")
     return 0

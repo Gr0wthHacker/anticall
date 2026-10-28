@@ -36,7 +36,7 @@
 |---|---|---|
 | `CALLSHIELD_ASTERISK_ENABLED=true` | `.env` | The runner refuses to start without it |
 | `CALLSHIELD_ASTERISK_ARI_URL` | `.env` | `http://127.0.0.1:8088` (no credentials in the URL) |
-| `CALLSHIELD_ASTERISK_ARI_USERNAME`, `..._ARI_PASSWORD` | `.env` | Must match `ari.conf`. The older `CALLSHIELD_ARI_URL/USERNAME/PASSWORD/APP` names written by `callshield init` are accepted as fallbacks (a trailing `/ari` is stripped) |
+| `CALLSHIELD_ASTERISK_ARI_USERNAME`, `..._ARI_PASSWORD` | `.env` | Must match `ari.conf`. `callshield init` writes these names. The older `CALLSHIELD_ARI_URL/USERNAME/PASSWORD/APP` names are accepted only as fallbacks (a trailing `/ari` is stripped); `CALLSHIELD_ARI_ENABLED` is not honored, use `CALLSHIELD_ASTERISK_ENABLED` |
 | `CALLSHIELD_ASTERISK_TRUNK_ENDPOINT` | `.env` | PJSIP endpoint name of the trunk (`trunk`) |
 | `CALLSHIELD_ASTERISK_DIAL_FORMAT` | `.env` | Outbound dial string, default `PJSIP/{number}@{trunk}`; `..._DIAL_STRIP_PLUS=true` if your provider wants digits only |
 | `CALLSHIELD_ASTERISK_USER_DIAL_FORMAT` | `.env` | How "ring the user" dials (default same shape; use `PJSIP/user` style for a softphone) |
@@ -46,7 +46,7 @@
 | `CALLSHIELD_DIALER=asterisk` + `CALLSHIELD_OUTBOUND_ENABLED=true` | worker/API `.env` | Selects the Asterisk dialer for callbacks. Otherwise the disabled dialer is used |
 | `TRUNK_HOST`, `TRUNK_PORT`, `TRUNK_USERNAME`, `TRUNK_PASSWORD`, `TRUNK_TRANSPORT`, `TRUNK_CODECS`, `USER_ENDPOINT_PASSWORD`, `EXTERNAL_IP` | `.env` | Rendered into `pjsip.conf` by the Asterisk container entrypoint |
 
-Voice engines come from `CALLSHIELD_VOICE_*` (see [`voice.md`](voice.md)). With no STT engine configured, unknown callers fall back to ring/voicemail and callbacks cannot hear anyone.
+Voice engines come from `CALLSHIELD_VOICE_*` (`callshield init` writes `_STT_ENGINE`, `_TTS_ENGINE` and the matching `_STT_MODEL_DIR`/`_TTS_MODEL_DIR`) (see [`voice.md`](voice.md)). With no STT engine configured, unknown callers fall back to ring/voicemail and callbacks cannot hear anyone.
 
 ```bash
 docker compose -f infra/docker/docker-compose.yml --profile asterisk up --build

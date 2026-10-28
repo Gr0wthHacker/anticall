@@ -23,7 +23,7 @@ cd apps/api
 callshield init
 ```
 
-Press Enter to accept the defaults (SQLite, generic profile, every gated feature **No**). The wizard writes `.env` (mode 0600 where the OS supports it), `pjsip.callshield.conf`, `ari.callshield.conf` and `SETUP_REPORT.md` listing what is on and off. Secrets are generated for you and never printed. When asked for an admin email and password, give them: you need that login below.
+Press Enter to accept the defaults (SQLite, generic profile, every gated feature **No**). The wizard writes `.env` (mode 0600 where the OS supports it), `pjsip.callshield.conf`, `ari.callshield.conf` and `SETUP_REPORT.md` listing what is on and off. Secrets are generated for you and never printed. When asked for an admin email and password, give them: you need that login below. It writes the `CALLSHIELD_ASTERISK_*` and `CALLSHIELD_VOICE_*` variables listed in [`configuration-reference.md`](deployment/configuration-reference.md).
 
 Prefer scripts? `callshield init --non-interactive --answers answers.json` (see `callshield init --help`).
 

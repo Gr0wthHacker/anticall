@@ -11,9 +11,11 @@ from pydantic import ValidationError
 from pydantic_settings import BaseSettings
 
 from callshield.callback.config import CallbackSettings
-from callshield.configreg.ext_settings import AriSettings, InstanceSettings, VoiceSettings
+from callshield.configreg.ext_settings import InstanceSettings
 from callshield.core.config import Settings
 from callshield.llm.config import LLMSettings
+from callshield.telephony.asterisk.settings import AsteriskSettings
+from callshield.voice.config import VoiceSettings
 
 Status = Literal["PASS", "WARN", "FAIL", "SKIP"]
 
@@ -53,7 +55,7 @@ class AriProbe:
 @dataclass
 class DoctorDeps:
     check_db: Callable[[str], DbStatus]
-    probe_ari: Callable[[AriSettings, str], AriProbe]
+    probe_ari: Callable[[AsteriskSettings, str], AriProbe]
     module_available: Callable[[str], bool]
 
 
@@ -63,13 +65,13 @@ class LoadedConfig:
     callback: CallbackSettings
     llm: LLMSettings
     instance: InstanceSettings
-    ari: AriSettings
+    asterisk: AsteriskSettings
     voice: VoiceSettings
     env_file: Path | None = None
     extra: dict[str, str] = field(default_factory=dict)
 
     def all_models(self) -> list[BaseSettings]:
-        return [self.settings, self.callback, self.llm, self.instance, self.ari, self.voice]
+        return [self.settings, self.callback, self.llm, self.instance, self.asterisk, self.voice]
 
 
 def safe_validation_message(exc: ValidationError) -> str:

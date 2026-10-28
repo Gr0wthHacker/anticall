@@ -12,7 +12,7 @@ GROUP_TITLES = {
     "CallbackSettings": "Callback flow",
     "LLMSettings": "LLM (optional)",
     "InstanceSettings": "Instance (written by `callshield init`)",
-    "AriSettings": "Asterisk ARI",
+    "AsteriskSettings": "Asterisk telephony (ARI)",
     "VoiceSettings": "Voice engines",
 }
 TABLE_HEAD = "| Variable | Type | Default | Range | Who may change | Related gate | Description |"
