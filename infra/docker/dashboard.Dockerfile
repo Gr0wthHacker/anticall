@@ -1,11 +1,11 @@
 # Build from repo root: docker build -f infra/docker/dashboard.Dockerfile .
 # Requires `output: "standalone"` in apps/dashboard/next.config.*
-FROM node:22-alpine AS deps
+FROM node:26-alpine AS deps
 WORKDIR /app
 COPY apps/dashboard/package.json apps/dashboard/package-lock.json ./
 RUN npm ci
 
-FROM node:22-alpine AS build
+FROM node:26-alpine AS build
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 ARG NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000
@@ -14,7 +14,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY apps/dashboard/ ./
 RUN npm run build
 
-FROM node:22-alpine AS runtime
+FROM node:26-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
